@@ -153,6 +153,7 @@ export default function App() {
     }
 
     if (appState === 'IDLE' || (!isConfirm && msg.length > 5)) {
+      localStorage.setItem('nextify_temp_data', JSON.stringify({ msg, sellingPrice, images }));
       const cleanMsg = msg.replace(/\/analyse-product/g, '').replace(/بدء تشغيل النظام للمنتج:/g, '').trim();
       setProductName(cleanMsg || 'UNKNOWN_PRODUCT');
       setAppState('LOADING');
@@ -256,7 +257,13 @@ export default function App() {
     }
   };
 
-  const handleNext = () => handleSendMessage('اعتماد');
+  const handleNext = async (rebuildPhase?: string) => {
+    if (rebuildPhase) {
+        // Logic to clear subsequent data and rebuild specific phase will go here.
+        // For now, setting phase state and triggering handleSendMessage 'اعتماد' logic if needed.
+    }
+    handleSendMessage('اعتماد');
+  };
 
   const handleDownloadPdf = () => {
     const element = document.getElementById('printable-area');

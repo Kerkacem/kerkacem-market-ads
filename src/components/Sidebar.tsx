@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { LayoutDashboard, Zap, LayoutTemplate, Briefcase, PlaySquare, Settings, Compass, Users, Activity, Folder, ChevronDown, ChevronRight, PenTool, Search, Filter, ArrowUpDown, X } from 'lucide-react';
 import { AppState } from '../types';
 import { ProjectData } from '../App';
+import { SettingsModal } from './SettingsModal';
 
 interface SidebarProps {
   appState: AppState;
@@ -21,6 +22,7 @@ export function Sidebar({ appState, projects = [], currentProjectId, onSelectPro
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'name-asc' | 'name-desc'>('newest');
   const [filterState, setFilterState] = useState<AppState | 'ALL'>('ALL');
   const [showFilters, setShowFilters] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   const filteredProjects = useMemo(() => {
     return projects.filter(p => {
@@ -195,11 +197,14 @@ export function Sidebar({ appState, projects = [], currentProjectId, onSelectPro
             <option value="gemini-3.1-flash-lite-preview">Gemini 3.1 Flash Lite Preview (Recommended)</option>
           </select>
         </div>
-        <button className="w-full flex items-center gap-3 px-4 py-3 font-display font-bold uppercase text-sm group text-black border-2 border-transparent hover:border-black hover:bg-[#00FF41] transition-all">
+        <button 
+          onClick={() => setShowSettings(true)}
+          className="w-full flex items-center gap-3 px-4 py-3 font-display font-bold uppercase text-sm group text-black border-2 border-transparent hover:border-black hover:bg-[#00FF41] transition-all">
           <Settings size={18} className="group-hover:rotate-90 transition-transform" />
           <span>إعدادات النظام</span>
         </button>
       </div>
+      <SettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} />
     </aside>
     </>
   );

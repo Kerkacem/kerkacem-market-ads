@@ -12,7 +12,14 @@ import {
 } from '../types';
 import { BILLIONAIRE_MINDSET_PROTOCOL } from './mindset';
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+export function getAiClient() {
+  const keys = localStorage.getItem('nextify_api_keys');
+  const apiKey = keys ? JSON.parse(keys)[0] : process.env.GEMINI_API_KEY;
+  if (!apiKey) throw new Error("API Key configuration error.");
+  return new GoogleGenAI({ apiKey });
+}
+
+// استخدام getAiClient() بدلاً من ai مباشر في الدوال
 
 export let currentModel = 'gemini-3.1-flash-lite-preview';
 export function setModel(newModel: string) { currentModel = newModel; }
@@ -55,7 +62,7 @@ async function analyzeImages(images: string[]): Promise<string> {
       }
   });
 
-  const response = await withRetry(() => ai.models.generateContent({
+  const response = await withRetry(() => getAiClient().models.generateContent({
     model: currentModel,
     contents: parts,
   }));
@@ -152,7 +159,7 @@ Keep your response between 150-300 words. No preamble. Go straight into your ana
   // 1. Generate 5 advisor responses in parallel
   const advisorPromises = advisors.map(adv => 
     withRetry(async () => {
-      const response = await ai.models.generateContent({
+      const response = await getAiClient().models.generateContent({
         model: currentModel,
         contents: getAdvisorPrompt(adv),
       });
@@ -188,7 +195,7 @@ Keep your review under 200 words. Be direct.
 
   const reviewPromises = advisors.map(() => 
     withRetry(async () => {
-      const response = await ai.models.generateContent({
+      const response = await getAiClient().models.generateContent({
         model: currentModel,
         contents: getReviewerPrompt(),
       });
@@ -242,7 +249,7 @@ Produce the final council verdict in Arabic. You must return ONLY valid JSON mat
     required: ["agreements", "clashes", "blindSpots", "recommendation", "oneThingToDoFirst"]
   };
 
-  const finalResponse = await withRetry(() => ai.models.generateContent({
+  const finalResponse = await withRetry(() => getAiClient().models.generateContent({
     model: currentModel,
     contents: chairmanPrompt,
     config: {
@@ -343,7 +350,7 @@ Return ONLY a valid JSON object matching this schema exactly.
     required: ["productContext", "summary", "testPhase", "audiences", "exclusionRules", "instructions"]
   };
 
-  const response = await withRetry(() => ai.models.generateContent({
+  const response = await withRetry(() => getAiClient().models.generateContent({
     model: currentModel,
     contents: prompt,
     config: {
@@ -601,7 +608,7 @@ ${sellingPrice ? `السعر: ${sellingPrice}` : ''}`;
     });
   }
 
-  const response = await withRetry(() => ai.models.generateContent({
+  const response = await withRetry(() => getAiClient().models.generateContent({
     model: currentModel,
     contents: parts,
     config: { 
@@ -700,7 +707,7 @@ export async function runPhase2(phase1Data: Phase1_Intelligence): Promise<Phase2
 استخدم لغة استراتيجية عميقة ومناسبة للسوق المحلي والمواصفات السابقة للمنتج.
   `;
 
-  const response = await withRetry(() => ai.models.generateContent({
+  const response = await withRetry(() => getAiClient().models.generateContent({
     model: currentModel,
     contents: [{ text: `${SYSTEM_PROMPT}\n\n${instructions}\n\n[بيانات المنتج]\n${JSON.stringify(phase1Data)}` }],
     config: { responseMimeType: 'application/json', responseSchema: schema }
@@ -796,7 +803,7 @@ Assure-toi que "color_transition" indique en HEX les couleurs de liaison entre c
 Ajoute OBLIGATOIREMENT dans le prompt de l'image (Text Layout Requirements) : "[STRICT DESIGN REQUIREMENT: ALL visible text/numbers MUST be in Classical Arabic exclusively. English/French text strictly FORBIDDEN. Numbers MUST be written using Western/French Arabic numerals (0, 1, 2, 3...) ONLY. Eastern Arabic numerals (٠, ١, ٢...) are strictly FORBIDDEN. ZERO deviation from the original product shape and packaging - Exact Original Product Image Only.]"
   `;
 
-  const response = await withRetry(() => ai.models.generateContent({
+  const response = await withRetry(() => getAiClient().models.generateContent({
     model: currentModel,
     contents: [{ text: `${SYSTEM_PROMPT}\n\nالإرشادات لصفحة الهبوط (Landing Page Brief):\n${lpInstructions}\n\nبناءً على معلومات هذا المنتج: \n${JSON.stringify(phase1Data)}` }],
     config: { responseMimeType: 'application/json', responseSchema: schema }
@@ -846,7 +853,7 @@ export async function runPhase4(phase1Data: Phase1_Intelligence): Promise<Phase4
     }, 
     required: ["characterSheet", "scenes", "voiceOverScript"] 
   };
-  const response = await withRetry(() => ai.models.generateContent({
+  const response = await withRetry(() => getAiClient().models.generateContent({
     model: currentModel,
     contents: [{ text: `${SYSTEM_PROMPT}\n\nالمهمة: إنشاء سير عمل فيديو إعلاني احترافي بـ 5 مشاهد.\n\n[أوامر السرد القصصي والتطابق]:\n1. يجب الاعتماد وجوباً وحصراً على الـ Untapped Angles التالية لتصميم السرد القصصي للفيديو: ${JSON.stringify(phase1Data.untappedAngles)}.\n2. التطابق البصري الحرفي (100% PRODUCT IMAGE FIDELITY): يجب إضافة أمر مقيد وصارم في \`debutPromptEN\` و \`finPromptEN\` و \`characterSheet.promptEN\` ينص على استخدام الحفاظ على صورة وشكل المنتج الحقيقي بنسبة 100% بدون أي تعديلات مهما صغرت (Exact Actual Product).\n3. منع اللغة الإنجليزية والأرقام المشرقية في التصميم: أضف الإلزام التالي في نهاية كل برومبت (debutPromptEN, finPromptEN, characterSheet.promptEN): "[STRICT DESIGN REQUIREMENT: ALL visible text/numbers MUST be in Classical Arabic exclusively. English/French text strictly FORBIDDEN. Numbers MUST be written using Western/French Arabic numerals (0, 1, 2, 3...) ONLY. Eastern Arabic numerals (٠, ١, ٢...) are strictly FORBIDDEN. ZERO deviation from the original product shape and packaging - Exact Original Product Image Only.]"` }],
     config: { responseMimeType: 'application/json', responseSchema: schema }
@@ -915,7 +922,7 @@ export async function runPhase5(phase1Data: Phase1_Intelligence): Promise<Phase5
 الهدف رفع سرعة الإطلاق المتوازي واستغلال الـ Bulk Endpoints.
   `;
 
-  const response = await withRetry(() => ai.models.generateContent({
+  const response = await withRetry(() => getAiClient().models.generateContent({
     model: currentModel,
     contents: [{ text: `${SYSTEM_PROMPT}\n\nالمهمة: بناء استراتيجية حملة Meta Ads متقدمة واختبار أولي. يجب الاعتماد وجوباً وحصراً على الـ Untapped Angles التالية لاختبارها في إعلاناتك: ${JSON.stringify(phase1Data.untappedAngles)}. يمنع منعاً باتاً أي إضافات خارج هذا السياق.\n\n${bulkLauncherInstructions}` }],
     config: { responseMimeType: 'application/json', responseSchema: schema }
@@ -934,7 +941,7 @@ export async function runPhase6(phase1Data: Phase1_Intelligence): Promise<Phase6
     }, 
     required: ["testingPlan7Days", "scalingWinners", "creativeIterations", "killStrategy"] 
   };
-  const response = await withRetry(() => ai.models.generateContent({
+  const response = await withRetry(() => getAiClient().models.generateContent({
     model: currentModel,
     contents: [{ text: `${SYSTEM_PROMPT}\n\nالمهمة: بناء نظام توسيع الحملة (Scaling) وادارة ميزانية. يجب الاعتماد وجوباً وحصراً على الـ Untapped Angles التي نجحت في الاختبار: ${JSON.stringify(phase1Data.untappedAngles)}. يمنع منعاً باتاً أي إضافات خارج هذا السياق.` }],
     config: { responseMimeType: 'application/json', responseSchema: schema }
@@ -991,7 +998,7 @@ ${phase1Data ? `[السياق الكامل من التحليل]: ${JSON.stringif
 4. الأفكار غير المستهلكة: دمر الكليشيهات القديمة. قدم المنتج كـ "ثورة" أو "سر مسرب" بأسلوب هجومي.
 5. تجنب كوارث تصميم واجهة المستخدم (UX): في تصميم السرد للموقع أو الإعلانات النصية، يمنع منعاً باتاً تكرار نفس العناوين أو الخطافات. يمنع وضع دعوات للاستكشاف مثل "انقر لقراءة التقييمات"، بل وجه العميل مباشرة للشراء.`;
 
-  const response = await withRetry(() => ai.models.generateContent({
+  const response = await withRetry(() => getAiClient().models.generateContent({
     model: currentModel,
     contents: [{ text: `${SYSTEM_PROMPT}\n\n${ADVANCED_PHASE7_PROMPT}` }],
     config: { responseMimeType: 'application/json', responseSchema: schema }
@@ -1000,7 +1007,7 @@ ${phase1Data ? `[السياق الكامل من التحليل]: ${JSON.stringif
 }
 
 export async function checkSpellingAndGrammar(text: string, model: string = 'gemini-3.1-flash-lite-preview'): Promise<string> {
-  const response = await withRetry(() => ai.models.generateContent({
+  const response = await withRetry(() => getAiClient().models.generateContent({
     model: model,
     contents: [{ text: `قم بتصحيح الأخطاء الإملائية والنحوية للنص التالي بالدارجة الجزائرية أو العربية الفصحى (حسب السياق) مع الحفاظ على الأسلوب التسويقي المقنع. لا تضف أي نص آخر، أخرج النص المصحح فقط:\n\n${text}` }],
     config: { temperature: 0.1 }
