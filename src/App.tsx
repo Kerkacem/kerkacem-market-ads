@@ -147,7 +147,7 @@ export default function App() {
       } catch (error) {
         console.error(error);
         setAppState('IDLE');
-        alert('حدث خطأ في طلب توليد الإعلانات.');
+        showApiError(error, 'طلب توليد الإعلانات');
       }
       return;
     }
@@ -163,10 +163,17 @@ export default function App() {
         const result = await runPhase0(cleanMsg, sellingPrice, images);
         setData0(result);
         setAppState('PHASE_0_DONE');
-      } catch (error) {
+      } catch (error: any) {
         console.error(error);
         setAppState('IDLE');
-        alert('حدث خطأ في طلب المرحلة 0.');
+        const errorMsg = error?.message || '';
+        if (errorMsg.includes('429') || errorMsg.includes('quota') || errorMsg.includes('RESOURCE_EXHAUSTED')) {
+          alert('⚠️ تم تجاوز حصة API المجانية.\n\nالحل:\n1. اضغط على "إعدادات النظام" في القائمة الجانبية\n2. أضف مفتاح API جديد من Google AI Studio\n3. الرابط: https://aistudio.google.com/apikey');
+        } else if (errorMsg.includes('503') || errorMsg.includes('UNAVAILABLE')) {
+          alert('⏳ النموذج يعاني من ضغط عالي حالياً.\n\nيرجى المحاولة مرة أخرى بعد دقائق قليلة.');
+        } else {
+          alert('حدث خطأ في طلب المرحلة 0.\n\nتأكد من وجود مفتاح API صالح في الإعدادات.');
+        }
       }
     } else if (isConfirm) {
       if (appState === 'PHASE_0_DONE' && data0) {
@@ -179,7 +186,7 @@ export default function App() {
         } catch (error) {
           console.error(error);
           setAppState('PHASE_0_DONE');
-          alert('حدث خطأ في طلب المرحلة 0.5.');
+          showApiError(error, 'المرحلة 0.5');
         }
       } else if (appState === 'PHASE_05_DONE' && data05) {
         setAppState('LOADING');
@@ -191,7 +198,7 @@ export default function App() {
         } catch (error) {
           console.error(error);
           setAppState('PHASE_05_DONE');
-          alert('حدث خطأ في طلب المرحلة 1. تحقق من مفتاح API أو المدخلات.');
+          showApiError(error, 'المرحلة 1');
         }
       } else if (appState === 'PHASE_1_DONE' && data1) {
         setAppState('LOADING');
@@ -201,7 +208,7 @@ export default function App() {
           setData2(res);
           setAppState('PHASE_2_DONE');
         } catch (error) {
-          console.error(error); setAppState('PHASE_1_DONE'); alert('فشل في هندسة الـ Briefs (المرحلة 2).');
+          console.error(error); setAppState('PHASE_1_DONE'); showApiError(error, 'المرحلة 2');
         }
       } else if (appState === 'PHASE_2_DONE' && data1) {
         setAppState('LOADING');
@@ -211,7 +218,7 @@ export default function App() {
           setData3(res);
           setAppState('PHASE_3_DONE');
         } catch (error) {
-           console.error(error); setAppState('PHASE_2_DONE'); alert('فشل في تصميم الـ Landing Page.');
+           console.error(error); setAppState('PHASE_2_DONE'); showApiError(error, 'المرحلة 3');
         }
       } else if (appState === 'PHASE_3_DONE' && data1) {
         setAppState('LOADING');
@@ -221,7 +228,7 @@ export default function App() {
           setData4(res);
           setAppState('PHASE_4_DONE');
         } catch (error) {
-           console.error(error); setAppState('PHASE_3_DONE'); alert('فشل في توليد الـ Video Workflow.');
+           console.error(error); setAppState('PHASE_3_DONE'); showApiError(error, 'المرحلة 4');
         }
       } else if (appState === 'PHASE_4_DONE' && data1) {
         setAppState('LOADING');
@@ -231,7 +238,7 @@ export default function App() {
           setData5(res);
           setAppState('PHASE_5_DONE');
         } catch (error) {
-           console.error(error); setAppState('PHASE_4_DONE'); alert('فشل في تصميم استراتيجية الإعلانات (المرحلة 5).');
+           console.error(error); setAppState('PHASE_4_DONE'); showApiError(error, 'المرحلة 5');
         }
       } else if (appState === 'PHASE_5_DONE' && data1) {
         setAppState('LOADING');
@@ -241,7 +248,7 @@ export default function App() {
           setData6(res);
           setAppState('PHASE_6_DONE');
         } catch (error) {
-           console.error(error); setAppState('PHASE_5_DONE'); alert('فشل في تصميم نظام التوسع (المرحلة 6).');
+           console.error(error); setAppState('PHASE_5_DONE'); showApiError(error, 'المرحلة 6');
         }
       } else if (appState === 'PHASE_6_DONE' && productName) {
         setAppState('LOADING');
@@ -251,9 +258,20 @@ export default function App() {
           setData7(res);
           setAppState('PHASE_7_DONE');
         } catch (error) {
-           console.error(error); setAppState('PHASE_6_DONE'); alert('فشل في توليد نصوص الإعلانات (المرحلة 7).');
+           console.error(error); setAppState('PHASE_6_DONE'); showApiError(error, 'المرحلة 7');
         }
       }
+    }
+  };
+
+  const showApiError = (error: any, phaseName: string) => {
+    const errorMsg = error?.message || '';
+    if (errorMsg.includes('429') || errorMsg.includes('quota') || errorMsg.includes('RESOURCE_EXHAUSTED')) {
+      alert(`⚠️ تم تجاوز حصة API المجانية.\n\nالحل:\n1. اضغط على "إعدادات النظام" في القائمة الجانبية\n2. أضف مفتاح API جديد من Google AI Studio\n3. الرابط: https://aistudio.google.com/apikey`);
+    } else if (errorMsg.includes('503') || errorMsg.includes('UNAVAILABLE')) {
+      alert(`⏳ النموذج يعاني من ضغط عالي حالياً.\n\nيرجى المحاولة مرة أخرى بعد دقائق قليلة.`);
+    } else {
+      alert(`حدث خطأ في ${phaseName}.\n\nتأكد من وجود مفتاح API صالح في الإعدادات.`);
     }
   };
 
