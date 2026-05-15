@@ -1,0 +1,174 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Cairo", Arial, sans-serif;
+  --font-display: "Cairo", "Arial Black", sans-serif;
+  --font-mono: "IBM Plex Mono", "Courier New", Courier, monospace;
+
+  /* Force legacy hex colors to prevent html2canvas oklab/oklch parse errors */
+  --color-black: #000000;
+  --color-white: #ffffff;
+  --color-transparent: transparent;
+  --color-accent: #00FF41;
+  
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #111827;
+  --color-gray-950: #030712;
+
+  --color-red-50: #fef2f2;
+  --color-red-100: #fee2e2;
+  --color-red-200: #fecaca;
+  --color-red-300: #fca5a5;
+  --color-red-400: #f87171;
+  --color-red-500: #ef4444;
+  --color-red-600: #dc2626;
+  --color-red-700: #b91c1c;
+  --color-red-800: #991b1b;
+  --color-red-900: #7f1d1d;
+
+  --color-green-50: #f0fdf4;
+  --color-green-100: #dcfce7;
+  --color-green-200: #bbf7d0;
+  --color-green-300: #86efac;
+  --color-green-400: #4ade80;
+  --color-green-500: #22c55e;
+  --color-green-600: #16a34a;
+  --color-green-700: #15803d;
+  --color-green-800: #166534;
+  --color-green-900: #14532d;
+}
+
+body {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+  overscroll-behavior-x: none;
+  position: relative;
+}
+
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+.neo-shadow {
+  box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 1);
+}
+
+.neo-shadow-hover:hover {
+  box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 1);
+  transform: translate(-2px, -2px);
+}
+
+.neo-shadow-hover:active {
+  box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 1);
+  transform: translate(2px, 2px);
+}
+
+@media print {
+  /* Ensure backgrounds render faithfully for professional results */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* 1. Reset everything to flow naturally (block) and remove heights/overflow clips */
+  *, *::before, *::after {
+    overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
+  }
+  
+  html, body, #app-root {
+    display: block !important;
+    position: relative !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+    background: white !important;
+  }
+
+  /* 2. Break Tailwind flex/height screen locks */
+  .flex.h-screen {
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* 3. Hide all non-essential UI perfectly */
+  .print-hide, aside, header, form, .composer, .printable-hide, button {
+    display: none !important;
+  }
+
+  /* 4. Release the main printable container */
+  .print-block, #printable-area, main {
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+    position: static !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* 5. Handle page breaks to prevent ugly cuts */
+  .group\/brief, .group\/section, .group\/scene {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+}
+
+/* PDF Export Mode (forces full layout height for html2canvas) */
+.pdf-export-mode, .pdf-export-mode body {
+  overflow: visible !important;
+  height: auto !important;
+}
+
+.pdf-export-mode *, .pdf-export-mode *::before, .pdf-export-mode *::after {
+  overflow: visible !important;
+  height: auto !important;
+  max-height: none !important;
+}
+
+.pdf-export-mode body, 
+.pdf-export-mode #app-root, 
+.pdf-export-mode main, 
+.pdf-export-mode #printable-area,
+.pdf-export-mode .flex.h-screen {
+  display: block !important;
+  position: static !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 100% !important;
+  overflow: visible !important;
+}
+
+.pdf-export-mode .print-hide, 
+.pdf-export-mode aside, 
+.pdf-export-mode header, 
+.pdf-export-mode form, 
+.pdf-export-mode .composer, 
+.pdf-export-mode .printable-hide, 
+.pdf-export-mode button {
+  display: none !important;
+}
+
+.pdf-export-mode .group\/brief, 
+.pdf-export-mode .group\/section, 
+.pdf-export-mode .group\/scene {
+  page-break-inside: avoid;
+  break-inside: avoid;
+}

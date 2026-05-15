@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>AI Marketing OS Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800;900&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script>
+      // Fix for "Cannot set property X of #<Window> which has only a getter"
+      // This allows polyfills (like formdata-polyfill included by node-fetch) to overwrite fetch globals without crashing.
+      try {
+        ['fetch', 'Headers', 'Request', 'Response', 'FormData'].forEach(function(name) {
+          if (window[name]) {
+            let original = window[name];
+            Object.defineProperty(window, name, {
+              get: function() { return original; },
+              set: function(val) { original = val; }, // Safe setter prevents "getter-only" crash
+              configurable: true,
+              enumerable: true
+            });
+          }
+        });
+      } catch (err) {
+        console.warn('Polyfill config failed:', err);
+      }
+    </script>
+  </head>
+  <body class="antialiased text-black font-sans selection:bg-[#00FF41] selection:text-black">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+
