@@ -20,6 +20,14 @@ import { Loader2, Printer, Plus, Download, Menu, X } from 'lucide-react';
 // @ts-ignore
 import html2pdf from 'html2pdf.js';
 
+// SaaS Core Imports
+import { useAuth } from './context/AuthContext';
+import { SaaSAuth } from './components/SaaSAuth';
+import { SaaSLanding } from './components/SaaSLanding';
+import { SaaSPricing } from './components/SaaSPricing';
+import { ChargilyPaymentSim } from './components/ChargilyPaymentSim';
+import { SaaSAdmin } from './components/SaaSAdmin';
+
 export interface ProjectData {
   id: string;
   name: string;
@@ -37,6 +45,13 @@ export interface ProjectData {
 }
 
 export default function App() {
+  const { user, serverDbAvailable } = useAuth();
+  
+  // SaaS Navigation States
+  const [saasMode, setSaasMode] = useState<'dashboard' | 'workspace' | 'pricing' | 'payment-sim' | 'admin'>('dashboard');
+  const [selectedCheckoutPlan, setSelectedCheckoutPlan] = useState<'free' | 'pro' | 'agency' | 'enterprise'>('pro');
+  const [selectedCheckoutAmount, setSelectedCheckoutAmount] = useState<number>(1500);
+
   const [appState, setAppState] = useState<AppState>('IDLE');
   const [currentModel, setCurrentModel] = useState<string>('gemini-3.5-flash');
   
@@ -56,13 +71,51 @@ export default function App() {
   const [savedProjects, setSavedProjects] = useState<ProjectData[]>([]);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Load projects from LocalStorage on mount
-  useEffect(() => {
+  // Sync projects from database with localStorage backup
+  const fetchSaaSProjects = async () => {
+    if (serverDbAvailable && user) {
+      try {
+        const res = await fetch('/api/projects', {
+          headers: { 'Authorization': user.id }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const parsed = data.map((item: any) => ({
+            id: item.id,
+            name: item.name,
+            updatedAt: item.updatedAt,
+            appState: item.data.appState,
+            data0: item.data.data0 || null,
+            data05: item.data.data05 || null,
+            data1: item.data.data1 || null,
+            data2: item.data.data2 || null,
+            data3: item.data.data3 || null,
+            data4: item.data.data4 || null,
+            data5: item.data.data5 || null,
+            data6: item.data.data6 || null,
+            data7: item.data.data7 || null,
+          }));
+          setSavedProjects(parsed);
+          return;
+        }
+      } catch (err) {
+        console.error("Failed to fetch SaaS projects from database backend", err);
+      }
+    }
+    // Fallback to local storage
     try {
       const stored = localStorage.getItem('nextify_projects');
-      if (stored) setSavedProjects(JSON.parse(stored));
+      if (stored) {
+        setSavedProjects(JSON.parse(stored));
+      } else {
+        setSavedProjects([]);
+      }
     } catch (err) {}
-  }, []);
+  };
+
+  useEffect(() => {
+    fetchSaaSProjects();
+  }, [user, serverDbAvailable]);
 
   useEffect(() => {
     setModel(currentModel);
@@ -71,33 +124,75 @@ export default function App() {
   // Save project automatically when state changes
   useEffect(() => {
     if (appState === 'IDLE' || appState === 'LOADING') return;
+    if (!user) return; // Must be authenticated to trigger saves
+
+    const id = currentProjectId || Date.now().toString();
+    if (!currentProjectId) setCurrentProjectId(id);
     
-    setSavedProjects(prev => {
-      const id = currentProjectId || Date.now().toString();
-      if (!currentProjectId) setCurrentProjectId(id);
-      
-      const newProj: ProjectData = {
-        id,
-        name: productName,
-        updatedAt: Date.now(),
-        appState,
-        data0,
-        data05,
-        data1,
-        data2,
-        data3,
-        data4,
-        data5,
-        data6,
-        data7
-      };
-      
-      const exists = prev.some(p => p.id === id);
-      const updated = exists ? prev.map(p => p.id === id ? newProj : p) : [newProj, ...prev];
-      
-      localStorage.setItem('nextify_projects', JSON.stringify(updated));
-      return updated;
-    });
+    const newProj: ProjectData = {
+      id,
+      name: productName,
+      updatedAt: Date.now(),
+      appState,
+      data0,
+      data05,
+      data1,
+      data2,
+      data3,
+      data4,
+      data5,
+      data6,
+      data7
+    };
+
+    const saveFlow = async () => {
+      // Local Storage Backup
+      try {
+        const localProjsStr = localStorage.getItem('nextify_projects') || '[]';
+        const localProjs = JSON.parse(localProjsStr);
+        const exists = localProjs.some((p: any) => p.id === id);
+        const updated = exists ? localProjs.map((p: any) => p.id === id ? newProj : p) : [newProj, ...localProjs];
+        localStorage.setItem('nextify_projects', JSON.stringify(updated));
+        setSavedProjects(updated);
+      } catch (e) {}
+
+      // Server Data Sync
+      if (serverDbAvailable && user) {
+        try {
+          const res = await fetch('/api/projects/save', {
+            method: 'POST',
+            headers: { 
+              'Content-Type': 'application/json',
+              'Authorization': user.id
+            },
+            body: JSON.stringify({
+              id,
+              name: productName,
+              data: {
+                appState,
+                data0,
+                data05,
+                data1,
+                data2,
+                data3,
+                data4,
+                data5,
+                data6,
+                data7
+              }
+            })
+          });
+          if (!res.ok) {
+            const errData = await res.json();
+            alert(errData.error || 'تم بلوغ الحد الأقصى للمشاريع في خطتك الحالية.');
+          }
+        } catch (err) {
+          console.error("Failed to sync project save operation to server", err);
+        }
+      }
+    };
+
+    saveFlow();
   }, [appState, data0, data05, data1, data2, data3, data4, data5, data6, data7]);
 
   const loadProject = (proj: ProjectData) => {
@@ -128,6 +223,66 @@ export default function App() {
     setData6(null);
     setData7(null);
     setAppState('IDLE');
+  };
+
+  const handleDeleteProject = async (projId: string) => {
+    // 1. Delete locally
+    try {
+      const localProjsStr = localStorage.getItem('nextify_projects') || '[]';
+      const localProjs = JSON.parse(localProjsStr);
+      const updated = localProjs.filter((p: any) => p.id !== projId);
+      localStorage.setItem('nextify_projects', JSON.stringify(updated));
+      setSavedProjects(updated);
+    } catch (e) {}
+
+    // 2. Delete on backend db
+    if (serverDbAvailable && user) {
+      try {
+        await fetch(`/api/projects/${projId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': user.id }
+        });
+      } catch (e) {
+        console.error("Failed to delete project on server", e);
+      }
+    }
+
+    if (currentProjectId === projId) {
+      startNewProject();
+    }
+  };
+
+  const handleStartNewProjectSaaS = (name: string, price?: string, images?: string[]) => {
+    // Limit checking
+    const limit = user?.plan === 'free' ? 3 : user?.plan === 'pro' ? 20 : Infinity;
+    if (savedProjects.length >= limit) {
+      alert(`لقد بلغت الحد الأقصى للمشاريع في خطتك الحالية (${limit} مشاريع). يرجى الترقية لإضافة حزم جديدة!`);
+      setSaasMode('pricing');
+      return;
+    }
+
+    setCurrentProjectId(Date.now().toString());
+    setProductName(name);
+    setData0(null);
+    setData05(null);
+    setData1(null);
+    setData2(null);
+    setData3(null);
+    setData4(null);
+    setData5(null);
+    setData6(null);
+    setData7(null);
+    setAppState('IDLE');
+    
+    try {
+      localStorage.setItem('nextify_temp_data', JSON.stringify({
+        msg: `/analyse-product ${name}`,
+        sellingPrice: price,
+        images: images
+      }));
+    } catch (e) {}
+
+    setSaasMode('workspace');
   };
 
   const handleSendMessage = async (msg: string, images?: string[], sellingPrice?: string) => {
@@ -500,6 +655,78 @@ export default function App() {
     }, 400); // 400ms delay guarantees rendering
   };
 
+  // Conditional SaaS view rendering
+  if (!user) {
+    return <SaaSAuth />;
+  }
+
+  if (saasMode === 'dashboard') {
+    return (
+      <SaaSLanding
+        onSelectProject={(proj) => {
+          loadProject(proj);
+          setSaasMode('workspace');
+        }}
+        onStartNewProject={handleStartNewProjectSaaS}
+        onGoToPricing={() => setSaasMode('pricing')}
+        onGoToAdmin={() => setSaasMode('admin')}
+        projects={savedProjects}
+        onDeleteProject={handleDeleteProject}
+        onCreateNewProjectTrigger={() => {
+          const limit = user?.plan === 'free' ? 3 : user?.plan === 'pro' ? 20 : Infinity;
+          if (savedProjects.length >= limit) {
+            alert(`لقد بلغت الحد الأقصى للمشاريع في خطتك الحالية (${limit} مشاريع). يرجى الترقية لإضافة حزم جديدة!`);
+            setSaasMode('pricing');
+            return;
+          }
+          startNewProject();
+          setSaasMode('workspace');
+        }}
+      />
+    );
+  }
+
+  if (saasMode === 'pricing') {
+    return (
+      <SaaSPricing 
+        onBackToDashboard={() => setSaasMode('dashboard')}
+        onInitiatePayment={(plan, amount) => {
+          setSelectedCheckoutPlan(plan);
+          setSelectedCheckoutAmount(amount);
+          setSaasMode('payment-sim');
+        }}
+      />
+    );
+  }
+
+  if (saasMode === 'payment-sim') {
+    return (
+      <ChargilyPaymentSim
+        userId={user?.id || ''}
+        plan={selectedCheckoutPlan}
+        amount={selectedCheckoutAmount}
+        onPaymentSuccess={() => {
+          fetchSaaSProjects();
+          setSaasMode('dashboard');
+        }}
+        onPaymentCancel={() => {
+          setSaasMode('pricing');
+        }}
+      />
+    );
+  }
+
+  if (saasMode === 'admin') {
+    return (
+      <SaaSAdmin 
+        onBackToDashboard={() => {
+          fetchSaaSProjects();
+          setSaasMode('dashboard');
+        }}
+      />
+    );
+  }
+
   return (
     <div className="flex h-screen bg-white font-sans overflow-hidden text-black" dir="rtl" id="app-root">
       <Sidebar 
@@ -522,6 +749,9 @@ export default function App() {
               className="md:hidden p-1.5 flex items-center justify-center border-2 border-black text-black hover:bg-[#00FF41] transition-colors"
             >
               <Menu size={18} />
+            </button>
+            <button onClick={() => setSaasMode('dashboard')} className="px-3 py-1.5 bg-black text-[#00FF41] hover:bg-gray-900 border-2 border-black text-xs font-bold uppercase flex items-center gap-1.5 transition-colors">
+              <span>← العودة للوحة التحكم</span>
             </button>
             <button onClick={startNewProject} className="px-3 py-1.5 hover:bg-black hover:text-[#00FF41] bg-[#00FF41] text-black border-2 border-black text-xs font-bold uppercase flex items-center gap-2 transition-colors">
               <Plus size={14} /> <span className="hidden md:inline">NEW</span>

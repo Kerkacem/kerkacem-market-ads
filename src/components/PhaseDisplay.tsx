@@ -116,6 +116,17 @@ export function PhaseDisplay({ project, onNextPhase, isLoading }: { project: Pro
         </div>
       )}
 
+      {/* Designer Signature Footer */}
+      <div className="no-print mt-12 pt-6 border-t-2 border-black/15 flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-bold text-gray-400" dir="rtl">
+        <span>سلسلة تشغيل وتطبيق الخوارزمية الفائقة</span>
+        <div className="flex items-center gap-1.5 text-black">
+          <span>تصميم وتطوير:</span>
+          <span className="bg-black text-[#00FF41] px-2 py-0.5 border border-black font-extrabold uppercase font-mono tracking-wider text-[10px]">
+            كرباني بلقاسم KERBANI BELKACEM
+          </span>
+        </div>
+      </div>
+
     </div>
   );
 }

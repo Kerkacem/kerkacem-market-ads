@@ -142,11 +142,14 @@ export function SettingsModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
         </div>
 
         <button 
-          className="w-full bg-[#00FF41] text-black font-bold p-3 font-sans hover:bg-black hover:text-[#00FF41] border-2 border-black transition-all shadow-[4px_4px_0_rgba(0,0,0,1)] hover:shadow-none reset-button" 
+          className="w-full bg-[#00FF41] text-black font-bold p-3 font-sans hover:bg-black hover:text-[#00FF41] border-2 border-black transition-all shadow-[4px_4px_0_rgba(0,0,0,1)] hover:shadow-none reset-button mb-3" 
           onClick={onClose}
         >
           حفظ وإغلاق
         </button>
+        <div className="text-center pt-2 border-t border-black/10 text-[9px] font-bold text-gray-500 font-sans" dir="rtl">
+          طُور وصمم بواسطة: <span className="text-black font-mono font-black border border-black px-1.5 py-0.2 bg-black text-[#00FF41]">كرباني بلقاسم KERBANI BELKACEM</span>
+        </div>
       </div>
     </div>
   );

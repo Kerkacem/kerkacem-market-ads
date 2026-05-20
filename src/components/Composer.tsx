@@ -193,6 +193,10 @@ export function Composer({ onSendMessage, isLoading, disabled = false, isConfirm
             ))}
           </div>
         )}
+        <div className="flex justify-between items-center mt-2 px-1 text-[9px] font-mono text-gray-400 font-bold" dir="rtl">
+          <span>نهج التسويق المتقدم للتجارة الإلكترونية بالجزائر</span>
+          <span>تصميم كرباني بلقاسم KERBANI BELKACEM</span>
+        </div>
       </div>
     </div>
   );

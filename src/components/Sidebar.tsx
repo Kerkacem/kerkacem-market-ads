@@ -200,10 +200,18 @@ export function Sidebar({ appState, projects = [], currentProjectId, onSelectPro
         </div>
         <button 
           onClick={() => setShowSettings(true)}
-          className="w-full flex items-center gap-3 px-4 py-3 font-display font-bold uppercase text-sm group text-black border-2 border-transparent hover:border-black hover:bg-[#00FF41] transition-all">
+          className="w-full flex items-center gap-3 px-4 py-3 font-display font-bold uppercase text-sm group text-black border-2 border-transparent hover:border-black hover:bg-[#00FF41] transition-all mb-2">
           <Settings size={18} className="group-hover:rotate-90 transition-transform" />
           <span>إعدادات النظام</span>
         </button>
+        <div className="text-center pt-3 border-t border-black/10" dir="rtl">
+          <span className="text-[10px] text-gray-500 block font-bold leading-relaxed">
+            تصميم كرباني بلقاسم
+          </span>
+          <span className="text-[10px] text-black block font-black uppercase tracking-wider">
+            KERBANI BELKACEM
+          </span>
+        </div>
       </div>
       <SettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} />
     </aside>
