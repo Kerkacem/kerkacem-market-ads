@@ -2,19 +2,23 @@
 <img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
 </div>
 
-# Run and deploy your AI Studio app
+# AI Marketing OS Hub 🚀
 
-This contains everything you need to run your app locally.
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Kerkacem/kerkacem-market-ads)
 
-View your app in AI Studio: https://ai.studio/apps/c1314a11-76c4-411a-bd6f-fa801b673414
+## Local Dev
 
-## Run Locally
+```bash
+npm install
+# Set GEMINI_API_KEY in .env.local
+npm run dev
+```
 
-**Prerequisites:**  Node.js
+## Deploy to Render (1 Click)
 
+1. Click the **Deploy to Render** button above
+2. Log in with GitHub
+3. Add `GEMINI_API_KEY` in Environment Variables
+4. Deploy — done
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+Or manually: [render.com](https://render.com) → New Web Service → Connect your GitHub repo
