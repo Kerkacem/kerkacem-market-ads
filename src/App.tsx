@@ -173,7 +173,7 @@ export default function App() {
         setAppState('LOADING');
         setLoadingMsg('PHASE 0.5: Facebook Audience Builder - جاري بناء الجماهير...');
         try {
-          const result = await runPhase05(data0.question);
+          const result = await runPhase05(data0.question, data0);
           setData05(result);
           setAppState('PHASE_05_DONE');
         } catch (error) {
@@ -185,7 +185,7 @@ export default function App() {
         setAppState('LOADING');
         setLoadingMsg('PHASE 1: جاري تشريح المنتج واستخراج الذكاء الاستراتيجي (DZ Market)...');
         try {
-          const result = await runPhase1(data0.question, sellingPrice, images);
+          const result = await runPhase1(data0.question, sellingPrice, images, data0, data05);
           setData1(result);
           setAppState('PHASE_1_DONE');
         } catch (error) {
@@ -197,7 +197,7 @@ export default function App() {
         setAppState('LOADING');
         setLoadingMsg('PHASE 2: جاري إنشاء 5 Nextify Visual Briefs للإعلانات الصورية...');
         try {
-          const res = await runPhase2(data1);
+          const res = await runPhase2(data1, data05 || undefined);
           setData2(res);
           setAppState('PHASE_2_DONE');
         } catch (error) {
@@ -207,31 +207,31 @@ export default function App() {
         setAppState('LOADING');
         setLoadingMsg('PHASE 3: جاري بناء Landing Page Brief من 6 مناطق بيع (CRO)...');
         try {
-          const res = await runPhase3(data1);
+          const res = await runPhase3(data1, data2 || undefined);
           setData3(res);
           setAppState('PHASE_3_DONE');
         } catch (error) {
-           console.error(error); setAppState('PHASE_2_DONE'); alert('فشل في تصميم الـ Landing Page.');
+          console.error(error); setAppState('PHASE_2_DONE'); alert('فشل في تصميم الـ Landing Page.');
         }
       } else if (appState === 'PHASE_3_DONE' && data1) {
         setAppState('LOADING');
         setLoadingMsg('PHASE 4: جاري هندسة الفيديو الإعلاني، المشاهد، وتعليقها الصوتي بالفصحى الاحترافية...');
         try {
-          const res = await runPhase4(data1);
+          const res = await runPhase4(data1, data3 || undefined);
           setData4(res);
           setAppState('PHASE_4_DONE');
         } catch (error) {
-           console.error(error); setAppState('PHASE_3_DONE'); alert('فشل في توليد الـ Video Workflow.');
+          console.error(error); setAppState('PHASE_3_DONE'); alert('فشل في توليد الـ Video Workflow.');
         }
       } else if (appState === 'PHASE_4_DONE' && data1) {
         setAppState('LOADING');
         setLoadingMsg('PHASE 5: جاري بناء استراتيجية Meta Ads للسوق الجزائري...');
         try {
-          const res = await runPhase5(data1);
+          const res = await runPhase5(data1, data2 || undefined, data4 || undefined);
           setData5(res);
           setAppState('PHASE_5_DONE');
         } catch (error) {
-           console.error(error); setAppState('PHASE_4_DONE'); alert('فشل في تصميم استراتيجية الإعلانات (المرحلة 5).');
+          console.error(error); setAppState('PHASE_4_DONE'); alert('فشل في تصميم استراتيجية الإعلانات (المرحلة 5).');
         }
       } else if (appState === 'PHASE_5_DONE' && data1) {
         setAppState('LOADING');
@@ -312,7 +312,7 @@ export default function App() {
       setData6(null);
       setData7(null);
       try {
-        const result = await runPhase05(data0.question);
+        const result = await runPhase05(data0.question, data0);
         setData05(result);
         setAppState('PHASE_05_DONE');
       } catch (error) {
@@ -332,7 +332,7 @@ export default function App() {
       setData6(null);
       setData7(null);
       try {
-        const result = await runPhase1(targetQuery, savedPrice, savedImages);
+        const result = await runPhase1(targetQuery, savedPrice, savedImages, data0 || undefined, data05 || undefined);
         setData1(result);
         setAppState('PHASE_1_DONE');
       } catch (error) {
@@ -354,7 +354,7 @@ export default function App() {
       setData6(null);
       setData7(null);
       try {
-        const result = await runPhase2(data1);
+        const result = await runPhase2(data1, data05 || undefined);
         setData2(result);
         setAppState('PHASE_2_DONE');
       } catch (error) {
@@ -375,7 +375,7 @@ export default function App() {
       setData6(null);
       setData7(null);
       try {
-        const result = await runPhase3(data1);
+        const result = await runPhase3(data1, data2 || undefined);
         setData3(result);
         setAppState('PHASE_3_DONE');
       } catch (error) {
@@ -395,7 +395,7 @@ export default function App() {
       setData6(null);
       setData7(null);
       try {
-        const result = await runPhase4(data1);
+        const result = await runPhase4(data1, data3 || undefined);
         setData4(result);
         setAppState('PHASE_4_DONE');
       } catch (error) {
@@ -414,7 +414,7 @@ export default function App() {
       setData6(null);
       setData7(null);
       try {
-        const result = await runPhase5(data1);
+        const result = await runPhase5(data1, data2 || undefined, data4 || undefined);
         setData5(result);
         setAppState('PHASE_5_DONE');
       } catch (error) {

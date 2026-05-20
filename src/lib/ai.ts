@@ -93,7 +93,14 @@ function sanitizeOutput(text: string): string {
 
 // محلل صور متقدم لتحليل الصور من كل النواحي
 async function analyzeImages(images: string[]): Promise<string> {
-  const parts: any[] = [{ text: "قم بتحليل الصور التالية بالتفصيل الممل من كل النواحي (التصميم، المواد، الاستخدام، الجمهور المستهدف، نقاط القوة، نقاط الضعف، الفئة، التغليف، الهوية البصرية). استخرج كل التفاصيل الممكنة التي تساعد في بناء حملة تسويقية ناجحة." }];
+  const parts: any[] = [{ text: `أنت الآن 'محلل الصور التسويقي الذكي'. قم بإجراء تدقيق استخباراتي وتحليلي بصري عميق للصور الـ 5 المرفوعة للمنتج من منظور تسويقي متكامل للسوق الجزائري (COD).
+حلل بدقة ما يلي:
+1. المظهر والمادة والتصميم الفيزيائي للمنتج وعلامته التجارية (Branding).
+2. التغليف (Packaging) والألوان الجاذبة السائدة وهوية المنتج البصرية في الجزائر.
+3. زوايا الاستخدام العملي وجمهورها الأكثر تأثراً (النساء، الحرفيون، العائلات...).
+4. نقاط الموثوقية والثقة الظاهرة في الصور، والأخطاء التي يجب تفادي عرضها.
+5. استخلص الكلمات والجمل الجاذبة الفجائية التي يمكن كتابتها مباشرة على الإعلانات بناءً على تفاصيل المنتج الفيزيائية.
+استخرج كل التفاصيل الممكنة بدقة لندمجها في شلال المراحل والتصميم الإعلاني لاحقاً.` }];
 
   images.forEach(img => {
       const match = img.match(/^data:(image\/[a-zA-Z0-9+]+);base64,(.+)$/);
@@ -324,11 +331,25 @@ Produce the final council verdict in Arabic. You must return ONLY valid JSON mat
   };
 }
 
-export async function runPhase05(questionContext: string): Promise<Phase05_AudienceBuilder> {
+export async function runPhase05(questionContext: string, phase0Data?: Phase0_CouncilResult): Promise<Phase05_AudienceBuilder> {
+  let councilContext = "";
+  if (phase0Data) {
+    councilContext = `
+[مخرجات مجلس تفجير التقييم والـ LLM Council من المرحلة 0]:
+- التوصية النهائية للمجلس: ${phase0Data.verdict.recommendation}
+- الخطوة العاجلة المفتاحية الأولى: ${phase0Data.verdict.oneThingToDoFirst}
+- توافقات المستشارين الأساسية: ${phase0Data.verdict.agreements.join(" | ")}
+- نقاط الخلاف في المجلس: ${phase0Data.verdict.clashes.map(c => `${c.issue}: ${c.explanation}`).join(" | ")}
+- الزوايا العمياء التي نبه إليها المراجعون: ${phase0Data.verdict.blindSpots.join(" | ")}
+`;
+  }
+
   const prompt = `
-أنت خبير في الاستهداف عبر Meta Ads للسوق الجزائري (Facebook/Instagram).
+أنت خبير في الاستهداف وبناء الجماهير وتحليل فئات المشترين عبر Meta Ads للسوق الجزائري (Facebook/Instagram/TikTok) مع خبرة عميقة في الـ COD Cash on Delivery.
 من خلال الوصف التالي للمنتج: "${questionContext}"
-قم ببناء خطة استهداف الجماهير (Audience Builder) شاملة.
+${councilContext}
+
+المهمة: قم ببناء خطة استهداف الجماهير (Audience Builder) شاملة ومخصصة لمطابقة التوصيات السابقة لمجلس التقييم لتنطلق منها فيسبوك بذكاء.
 
 Return ONLY a valid JSON object matching this schema exactly.
   `;
@@ -408,7 +429,13 @@ Return ONLY a valid JSON object matching this schema exactly.
   return JSON.parse(response.text || "{}");
 }
 
-export async function runPhase1(productInput: string, sellingPrice?: string, productImages?: string[]): Promise<Phase1_Intelligence> {
+export async function runPhase1(
+  productInput: string,
+  sellingPrice?: string,
+  productImages?: string[],
+  phase0Data?: Phase0_CouncilResult,
+  phase05Data?: Phase05_AudienceBuilder
+): Promise<Phase1_Intelligence> {
   const schema: Schema = {
     type: Type.OBJECT,
     properties: {
@@ -633,9 +660,18 @@ Think-6 التقييم النهائي (Score) والتصنيف.
 
 يجب أن تعبئ كافة الحقول البالغ عددها أكثر من 20 حقلاً في هيكل JSON بأقصى قدر من الدقة، مع التركيز المكثف على أن تكون حقول الـ Untapped Angles غنية بالأفكار العملية.`;
 
+  let extraContext = "";
+  if (phase0Data) {
+    extraContext += `\n[توصية مجلس التقييم - Phase 0]:\n- الخلاصة والتوصية: ${phase0Data.verdict.recommendation}\n- أقوى خطوة أولى: ${phase0Data.verdict.oneThingToDoFirst}\n`;
+  }
+  if (phase05Data) {
+    extraContext += `\n[مخرجات بناء الجمهور - Phase 0.5]:\n- ملخص الجماهير المقترحة: ${phase05Data.summary}\n- الجماهير ذات الأولوية: ${phase05Data.testPhase.priorityAudiences.join(", ")}\n- موانع الاستبعاد: ${phase05Data.exclusionRules.join(", ")}\n`;
+  }
+
   const inputPrompt = `تشغيل التقرير الكامل استخبارات المنتج (Product Intelligence Report):
 المنتج: ${productInput}
-${sellingPrice ? `السعر: ${sellingPrice}` : ''}`;
+${sellingPrice ? `السعر: ${sellingPrice}` : ''}
+${extraContext}`;
 
   const parts: any[] = [{ text: `${SYSTEM_PROMPT}\n\n${DEEP_ANALYSIS_PROTOCOL}\n\n${inputPrompt}` }];
 
@@ -666,7 +702,7 @@ ${sellingPrice ? `السعر: ${sellingPrice}` : ''}`;
   return JSON.parse(sanitizeOutput(response.text!)) as Phase1_Intelligence;
 }
 
-export async function runPhase2(phase1Data: Phase1_Intelligence): Promise<Phase2_StaticBriefs> {
+export async function runPhase2(phase1Data: Phase1_Intelligence, phase05Data?: Phase05_AudienceBuilder): Promise<Phase2_StaticBriefs> {
   const schema: Schema = { 
     type: Type.OBJECT, 
     properties: {
@@ -752,15 +788,20 @@ export async function runPhase2(phase1Data: Phase1_Intelligence): Promise<Phase2
 استخدم لغة استراتيجية عميقة ومناسبة للسوق المحلي والمواصفات السابقة للمنتج.
   `;
 
+  let audienceContext = "";
+  if (phase05Data) {
+    audienceContext = `\n[توجيه بخصوص الجمهور المستهدف المستخلص من المرحلة 0.5]:\nملخص الجمهور: ${phase05Data.summary}\nالجماهير ذات الأولوية: ${phase05Data.testPhase.priorityAudiences.join(", ")}\nاجعل أفكار ونبرة الإعلانات الصورية الخمسة تتطابق بامتياز وتخاطب هذا الجمهور مباشرة.\n`;
+  }
+
   const response = await withRetry(() => getAiClient().models.generateContent({
     model: currentModel,
-    contents: [{ text: `${SYSTEM_PROMPT}\n\n${instructions}\n\n[بيانات المنتج]\n${JSON.stringify(phase1Data)}` }],
+    contents: [{ text: `${SYSTEM_PROMPT}\n\n${instructions}\n\n${audienceContext}\n\n[بيانات المنتج]\n${JSON.stringify(phase1Data)}` }],
     config: { responseMimeType: 'application/json', responseSchema: schema }
   }));
   return JSON.parse(sanitizeOutput(response.text!)) as Phase2_StaticBriefs;
 }
 
-export async function runPhase3(phase1Data: Phase1_Intelligence): Promise<Phase3_LandingPage> {
+export async function runPhase3(phase1Data: Phase1_Intelligence, phase2Data?: Phase2_StaticBriefs): Promise<Phase3_LandingPage> {
   const schema: Schema = {
     type: Type.OBJECT,
     properties: {
@@ -848,15 +889,24 @@ Assure-toi que "color_transition" indique en HEX les couleurs de liaison entre c
 Ajoute OBLIGATOIREMENT dans le prompt de l'image (Text Layout Requirements) : "[STRICT DESIGN REQUIREMENT: ALL visible text/numbers MUST be in Classical Arabic exclusively. English/French text strictly FORBIDDEN. Numbers MUST be written using Western/French Arabic numerals (0, 1, 2, 3...) ONLY. Eastern Arabic numerals (٠, ١, ٢...) are strictly FORBIDDEN. ZERO deviation from the original product shape and packaging - Exact Original Product Image Only.]"
   `;
 
+  let briefsContext = "";
+  if (phase2Data) {
+    briefsContext = `
+[معلومات الـ 5 Nextify Static Briefs المصممة في المرحلة 2]:
+استخدم هذه المفاهيم البصرية الـ 5 المجهزة مسبقاً وتفاصيلها لدمجها بانسجام دائم في الأقسام الستة (الـ 6 sections بالتوالي) لصفحة الهبوط لتكون هناك وحدة تصميمية وبصرية كاملة بين الإعلان وصفحة الهبوط:
+${phase2Data.briefs.map((b, i) => `المفهوم البصري ${i+1}: ${b.conceptName} (الزاوية: ${b.psychoAngle}) - العنوان الرئيسي للإعلان: "${b.textLayout?.headline}"`).join("\n")}
+`;
+  }
+
   const response = await withRetry(() => getAiClient().models.generateContent({
     model: currentModel,
-    contents: [{ text: `${SYSTEM_PROMPT}\n\nالإرشادات لصفحة الهبوط (Landing Page Brief):\n${lpInstructions}\n\nبناءً على معلومات هذا المنتج: \n${JSON.stringify(phase1Data)}` }],
+    contents: [{ text: `${SYSTEM_PROMPT}\n\nالإرشادات لصفحة الهبوط (Landing Page Brief):\n${lpInstructions}\n\n${briefsContext}\n\nبناءً على معلومات هذا المنتج: \n${JSON.stringify(phase1Data)}` }],
     config: { responseMimeType: 'application/json', responseSchema: schema }
   }));
   return JSON.parse(sanitizeOutput(response.text!)) as Phase3_LandingPage;
 }
 
-export async function runPhase4(phase1Data: Phase1_Intelligence): Promise<Phase4_VideoWorkflow> {
+export async function runPhase4(phase1Data: Phase1_Intelligence, phase3Data?: Phase3_LandingPage): Promise<Phase4_VideoWorkflow> {
   const schema: Schema = { 
     type: Type.OBJECT, 
     properties: {
@@ -898,15 +948,31 @@ export async function runPhase4(phase1Data: Phase1_Intelligence): Promise<Phase4
     }, 
     required: ["characterSheet", "scenes", "voiceOverScript"] 
   };
+  let lpContext = "";
+  if (phase3Data) {
+    lpContext = `
+[معلومات صفحة الهبوط المصممة في المرحلة 3]:
+زاوية التحويل المعتمدة (CRO Angle): ${phase3Data.marketing_angle}
+إطار العمل المستخدم (AIDA أو PAS): ${phase3Data.conversion_framework}
+نغمة السرد (Tone): ${phase3Data.tone}
+ملخص الأقسام الستة: ${phase3Data.sections.map(s => `${s.order}: ${s.title} (${s.section_type})`).join(" -> ")}
+يرجى جعل مشاهد الفيديو الإعلاني الخمسة وسيناريو الـ Voice Over بالدارجة الجزائرية يتبنى تماماً نفس أسلوب وسرد صفحة الهبوط لتكون وحدة ربط كاملة بين المشاهد ومحطة الشراء.
+`;
+  }
+
   const response = await withRetry(() => getAiClient().models.generateContent({
     model: currentModel,
-    contents: [{ text: `${SYSTEM_PROMPT}\n\nالمهمة: إنشاء سير عمل فيديو إعلاني احترافي بـ 5 مشاهد.\n\n[أوامر السرد القصصي والتطابق]:\n1. يجب الاعتماد وجوباً وحصراً على الـ Untapped Angles التالية لتصميم السرد القصصي للفيديو: ${JSON.stringify(phase1Data.untappedAngles)}.\n2. التطابق البصري الحرفي (100% PRODUCT IMAGE FIDELITY): يجب إضافة أمر مقيد وصارم في \`debutPromptEN\` و \`finPromptEN\` و \`characterSheet.promptEN\` ينص على استخدام الحفاظ على صورة وشكل المنتج الحقيقي بنسبة 100% بدون أي تعديلات مهما صغرت (Exact Actual Product).\n3. منع اللغة الإنجليزية والأرقام المشرقية في التصميم: أضف الإلزام التالي في نهاية كل برومبت (debutPromptEN, finPromptEN, characterSheet.promptEN): "[STRICT DESIGN REQUIREMENT: ALL visible text/numbers MUST be in Classical Arabic exclusively. English/French text strictly FORBIDDEN. Numbers MUST be written using Western/French Arabic numerals (0, 1, 2, 3...) ONLY. Eastern Arabic numerals (٠, ١, ٢...) are strictly FORBIDDEN. ZERO deviation from the original product shape and packaging - Exact Original Product Image Only.]"` }],
+    contents: [{ text: `${SYSTEM_PROMPT}\n\nالمهمة: إنشاء سير عمل فيديو إعلاني احترافي بـ 5 مشاهد.\n\n[أوامر السرد القصصي والتطابق]:\n1. يجب الاعتماد وجوباً وحصراً على الـ Untapped Angles التالية لتصميم السرد القصصي للفيديو: ${JSON.stringify(phase1Data.untappedAngles)}.\n2. التطابق البصري الحرفي (100% PRODUCT IMAGE FIDELITY): يجب إضافة أمر مقيد وصارم في \`debutPromptEN\` و \`finPromptEN\` و \`characterSheet.promptEN\` ينص على استخدام الحفاظ على صورة وشكل المنتج الحقيقي بنسبة 100% بدون أي تعديلات مهما صغرت (Exact Actual Product).\n3. منع اللغة الإنجليزية والأرقام المشرقية في التصميم: أضف الإلزام التالي في نهاية كل برومبت (debutPromptEN, finPromptEN, characterSheet.promptEN): "[STRICT DESIGN REQUIREMENT: ALL visible text/numbers MUST be in Classical Arabic exclusively. English/French text strictly FORBIDDEN. Numbers MUST be written using Western/French Arabic numerals (0, 1, 2, 3...) ONLY. Eastern Arabic numerals (٠, ١, ٢...) are strictly FORBIDDEN. ZERO deviation from the original product shape and packaging - Exact Original Product Image Only.]"\n\n${lpContext}` }],
     config: { responseMimeType: 'application/json', responseSchema: schema }
   }));
   return JSON.parse(sanitizeOutput(response.text!)) as Phase4_VideoWorkflow;
 }
 
-export async function runPhase5(phase1Data: Phase1_Intelligence): Promise<Phase5_MetaAdsStrategy> {
+export async function runPhase5(
+  phase1Data: Phase1_Intelligence,
+  phase2Data?: Phase2_StaticBriefs,
+  phase4Data?: Phase4_VideoWorkflow
+): Promise<Phase5_MetaAdsStrategy> {
   const schema: Schema = { 
     type: Type.OBJECT, 
     properties: {
@@ -967,9 +1033,17 @@ export async function runPhase5(phase1Data: Phase1_Intelligence): Promise<Phase5
 الهدف رفع سرعة الإطلاق المتوازي واستغلال الـ Bulk Endpoints.
   `;
 
+  let adsContext = "";
+  if (phase2Data) {
+    adsContext += `\n[مفاهيم الصور الإعلانية الثابتة المصممة في المرحلة 2 - لاستخدامها بالبنية]:\n${phase2Data.briefs.map((b, i) => `- المفهوم ${i+1}: ${b.conceptName} (العنوان: ${b.textLayout?.headline})`).join("\n")}\n`;
+  }
+  if (phase4Data) {
+    adsContext += `\n[سيناريو الفيديو الإعلاني المصمم في المرحلة 4 - لدمجه بالبنية]:\n- وصف الفيديو: ${phase4Data.characterSheet.description}\n- مشاهد الفيديو: ${phase4Data.scenes.map(s => s.sceneName).join(" -> ")}\n`;
+  }
+
   const response = await withRetry(() => getAiClient().models.generateContent({
     model: currentModel,
-    contents: [{ text: `${SYSTEM_PROMPT}\n\nالمهمة: بناء استراتيجية حملة Meta Ads متقدمة واختبار أولي. يجب الاعتماد وجوباً وحصراً على الـ Untapped Angles التالية لاختبارها في إعلاناتك: ${JSON.stringify(phase1Data.untappedAngles)}. يمنع منعاً باتاً أي إضافات خارج هذا السياق.\n\n${bulkLauncherInstructions}` }],
+    contents: [{ text: `${SYSTEM_PROMPT}\n\nالمهمة: بناء استراتيجية حملة Meta Ads متقدمة واختبار أولي. يجب الاعتماد وجوباً وحصراً على الـ Untapped Angles التالية لاختبارها في إعلاناتك: ${JSON.stringify(phase1Data.untappedAngles)}. يمنع منعاً باتاً أي إضافات خارج هذا السياق.\n\n${bulkLauncherInstructions}\n\n${adsContext}` }],
     config: { responseMimeType: 'application/json', responseSchema: schema }
   }));
   return JSON.parse(sanitizeOutput(response.text!)) as Phase5_MetaAdsStrategy;
