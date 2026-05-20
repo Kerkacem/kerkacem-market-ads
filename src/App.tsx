@@ -38,7 +38,7 @@ export interface ProjectData {
 
 export default function App() {
   const [appState, setAppState] = useState<AppState>('IDLE');
-  const [currentModel, setCurrentModel] = useState<string>('gemini-3.1-flash-lite-preview');
+  const [currentModel, setCurrentModel] = useState<string>('gemini-3.5-flash');
   
   const [data0, setData0] = useState<Phase0_CouncilResult | null>(null);
   const [data05, setData05] = useState<Phase05_AudienceBuilder | null>(null);
@@ -257,11 +257,206 @@ export default function App() {
     }
   };
 
-  const handleNext = async (rebuildPhase?: string) => {
-    if (rebuildPhase) {
-        // Logic to clear subsequent data and rebuild specific phase will go here.
-        // For now, setting phase state and triggering handleSendMessage 'اعتماد' logic if needed.
+  const handleRebuildPhase = async (phase: string) => {
+    let savedMsg = productName || '';
+    let savedPrice = undefined;
+    let savedImages = undefined;
+    try {
+      const stored = localStorage.getItem('nextify_temp_data');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed.msg) savedMsg = parsed.msg;
+        if (parsed.sellingPrice) savedPrice = parsed.sellingPrice;
+        if (parsed.images) savedImages = parsed.images;
+      }
+    } catch (e) {
+      console.error("Failed to read nextify_temp_data from localStorage:", e);
     }
+
+    const cleanMsg = savedMsg.replace(/\/analyse-product/g, '').replace(/بدء تشغيل النظام للمنتج:/g, '').trim();
+
+    if (phase === '0') {
+      setAppState('LOADING');
+      setLoadingMsg('PHASE 0: إعادة بناء مجلس تقييم الفكرة (LLM Council)...');
+      setData0(null);
+      setData05(null);
+      setData1(null);
+      setData2(null);
+      setData3(null);
+      setData4(null);
+      setData5(null);
+      setData6(null);
+      setData7(null);
+      try {
+        const result = await runPhase0(cleanMsg, savedPrice, savedImages);
+        setData0(result);
+        setAppState('PHASE_0_DONE');
+      } catch (error) {
+        console.error(error);
+        setAppState('IDLE');
+        alert('حدث خطأ أثناء إعادة بناء المرحلة 0. يرجى تجربة مفتاح API آخر.');
+      }
+    } else if (phase === '0.5') {
+      if (!data0) {
+        alert('يجب بناء المرحلة 0 أولاً.');
+        return;
+      }
+      setAppState('LOADING');
+      setLoadingMsg('PHASE 0.5: إعادة بناء جماهير فيسبوك...');
+      setData05(null);
+      setData1(null);
+      setData2(null);
+      setData3(null);
+      setData4(null);
+      setData5(null);
+      setData6(null);
+      setData7(null);
+      try {
+        const result = await runPhase05(data0.question);
+        setData05(result);
+        setAppState('PHASE_05_DONE');
+      } catch (error) {
+        console.error(error);
+        setAppState('PHASE_0_DONE');
+        alert('حدث خطأ أثناء إعادة بناء المرحلة 0.5.');
+      }
+    } else if (phase === '1') {
+      const targetQuery = data0 ? data0.question : cleanMsg;
+      setAppState('LOADING');
+      setLoadingMsg('PHASE 1: إعادة بناء تشريح المنتج واستخراج الذكاء الاستراتيجي...');
+      setData1(null);
+      setData2(null);
+      setData3(null);
+      setData4(null);
+      setData5(null);
+      setData6(null);
+      setData7(null);
+      try {
+        const result = await runPhase1(targetQuery, savedPrice, savedImages);
+        setData1(result);
+        setAppState('PHASE_1_DONE');
+      } catch (error) {
+        console.error(error);
+        setAppState('PHASE_05_DONE');
+        alert('حدث خطأ أثناء إعادة بناء المرحلة 1.');
+      }
+    } else if (phase === '2') {
+      if (!data1) {
+         alert('يجب بناء المرحلة 1 أولاً.');
+         return;
+      }
+      setAppState('LOADING');
+      setLoadingMsg('PHASE 2: إعادة بناء 5 Nextify Visual Briefs للإعلانات الصورية...');
+      setData2(null);
+      setData3(null);
+      setData4(null);
+      setData5(null);
+      setData6(null);
+      setData7(null);
+      try {
+        const result = await runPhase2(data1);
+        setData2(result);
+        setAppState('PHASE_2_DONE');
+      } catch (error) {
+        console.error(error);
+        setAppState('PHASE_1_DONE');
+        alert('حدث خطأ أثناء إعادة بناء المرحلة 2.');
+      }
+    } else if (phase === '3') {
+      if (!data1) {
+         alert('يجب بناء المرحلة 1 أولاً.');
+         return;
+      }
+      setAppState('LOADING');
+      setLoadingMsg('PHASE 3: إعادة بناء Landing Page Brief من 6 مناطق بيع (CRO)...');
+      setData3(null);
+      setData4(null);
+      setData5(null);
+      setData6(null);
+      setData7(null);
+      try {
+        const result = await runPhase3(data1);
+        setData3(result);
+        setAppState('PHASE_3_DONE');
+      } catch (error) {
+        console.error(error);
+        setAppState('PHASE_2_DONE');
+        alert('حدث خطأ أثناء إعادة بناء المرحلة 3.');
+      }
+    } else if (phase === '4') {
+      if (!data1) {
+         alert('يجب بناء المرحلة 1 أولاً.');
+         return;
+      }
+      setAppState('LOADING');
+      setLoadingMsg('PHASE 4: إعادة بناء الفيديو الإعلاني والمشاهد والتعليق الصوتي...');
+      setData4(null);
+      setData5(null);
+      setData6(null);
+      setData7(null);
+      try {
+        const result = await runPhase4(data1);
+        setData4(result);
+        setAppState('PHASE_4_DONE');
+      } catch (error) {
+        console.error(error);
+        setAppState('PHASE_3_DONE');
+        alert('حدث خطأ أثناء إعادة بناء المرحلة 4.');
+      }
+    } else if (phase === '5') {
+      if (!data1) {
+         alert('يجب بناء المرحلة 1 أولاً.');
+         return;
+      }
+      setAppState('LOADING');
+      setLoadingMsg('PHASE 5: إعادة بناء استراتيجية Meta Ads للسوق الجزائري...');
+      setData5(null);
+      setData6(null);
+      setData7(null);
+      try {
+        const result = await runPhase5(data1);
+        setData5(result);
+        setAppState('PHASE_5_DONE');
+      } catch (error) {
+        console.error(error);
+        setAppState('PHASE_4_DONE');
+        alert('حدث خطأ أثناء إعادة بناء المرحلة 5.');
+      }
+    } else if (phase === '6') {
+      if (!data1) {
+         alert('يجب بناء المرحلة 1 أولاً.');
+         return;
+      }
+      setAppState('LOADING');
+      setLoadingMsg('PHASE 6: إعادة بناء نظام التوسع والربحية المستدامة...');
+      setData6(null);
+      setData7(null);
+      try {
+        const result = await runPhase6(data1);
+        setData6(result);
+        setAppState('PHASE_6_DONE');
+      } catch (error) {
+        console.error(error);
+        setAppState('PHASE_5_DONE');
+        alert('حدث خطأ أثناء إعادة بناء المرحلة 6.');
+      }
+    } else if (phase === '7') {
+      setAppState('LOADING');
+      setLoadingMsg('PHASE 7: إعادة بناء ونمذجة نصوص الإعلانات الصاروخية...');
+      setData7(null);
+      try {
+        const result = await runPhase7_AdGenerator(productName, data1 || undefined);
+        setData7(result);
+        setAppState('PHASE_7_DONE');
+      } catch (error) {
+        console.error(error);
+        setAppState('PHASE_6_DONE');
+        alert('حدث خطأ أثناء إعادة بناء المرحلة 7.');
+      }
+    }
+  };
+
+  const handleNext = async () => {
     handleSendMessage('اعتماد');
   };
 
@@ -368,15 +563,15 @@ export default function App() {
               <motion.div key="idle" className="h-full"><EmptyState /></motion.div>
             ) : (
                   <motion.div key="workflow" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-24 pb-16">
-                     {data0 && <Phase0View data={data0} onNext={handleNext} hideNext={appState !== 'PHASE_0_DONE'} />}
-                     {data05 && <Phase05View data={data05} onNext={handleNext} hideNext={appState !== 'PHASE_05_DONE'} />}
-                     {data1 && <Phase1View data={data1} onNext={handleNext} hideNext={appState !== 'PHASE_1_DONE'} />}
-                     {data2 && <Phase2View data={data2} onNext={handleNext} hideNext={appState !== 'PHASE_2_DONE'} />}
-                     {data3 && <Phase3View data={data3} onNext={handleNext} hideNext={appState !== 'PHASE_3_DONE'} />}
-                     {data4 && <Phase4View data={data4} onNext={handleNext} hideNext={appState !== 'PHASE_4_DONE'} />}
-                     {data5 && <Phase5View data={data5} onNext={handleNext} hideNext={appState !== 'PHASE_5_DONE'} />}
-                     {data6 && <Phase6View data={data6} onNext={handleNext} hideNext={appState !== 'PHASE_6_DONE'} />}
-                     {data7 && <Phase7View_AdGenerator data={data7} />}
+                     {data0 && <Phase0View data={data0} onNext={handleNext} onRebuild={() => handleRebuildPhase('0')} hideNext={appState !== 'PHASE_0_DONE'} />}
+                     {data05 && <Phase05View data={data05} onNext={handleNext} onRebuild={() => handleRebuildPhase('0.5')} hideNext={appState !== 'PHASE_05_DONE'} />}
+                     {data1 && <Phase1View data={data1} onNext={handleNext} onRebuild={() => handleRebuildPhase('1')} hideNext={appState !== 'PHASE_1_DONE'} />}
+                     {data2 && <Phase2View data={data2} onNext={handleNext} onRebuild={() => handleRebuildPhase('2')} hideNext={appState !== 'PHASE_2_DONE'} />}
+                     {data3 && <Phase3View data={data3} onNext={handleNext} onRebuild={() => handleRebuildPhase('3')} hideNext={appState !== 'PHASE_3_DONE'} />}
+                     {data4 && <Phase4View data={data4} onNext={handleNext} onRebuild={() => handleRebuildPhase('4')} hideNext={appState !== 'PHASE_4_DONE'} />}
+                     {data5 && <Phase5View data={data5} onNext={handleNext} onRebuild={() => handleRebuildPhase('5')} hideNext={appState !== 'PHASE_5_DONE'} />}
+                     {data6 && <Phase6View data={data6} onNext={handleNext} onRebuild={() => handleRebuildPhase('6')} hideNext={appState !== 'PHASE_6_DONE'} />}
+                     {data7 && <Phase7View_AdGenerator data={data7} onRebuild={() => handleRebuildPhase('7')} />}
                   </motion.div>
             )}
           </AnimatePresence>

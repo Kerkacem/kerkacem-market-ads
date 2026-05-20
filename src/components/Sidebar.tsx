@@ -190,11 +190,12 @@ export function Sidebar({ appState, projects = [], currentProjectId, onSelectPro
             onChange={(e) => onModelChange(e.target.value)}
             className="w-full text-xs p-2 border border-[#00000033] bg-white rounded-sm focus:outline-none focus:border-[#00FF41] cursor-pointer"
           >
+            <option value="gemini-3.5-flash">Gemini 3.5 Flash (Default)</option>
             <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
             <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
             <option value="gemini-3-flash-preview">Gemini 3 Flash Preview</option>
             <option value="gemini-3.1-pro-preview">Gemini 3.1 Pro Preview</option>
-            <option value="gemini-3.1-flash-lite-preview">Gemini 3.1 Flash Lite Preview (Recommended)</option>
+            <option value="gemini-3.1-flash-lite-preview">Gemini 3.1 Flash Lite Preview</option>
           </select>
         </div>
         <button 

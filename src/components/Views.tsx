@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { Target, Activity, CheckCircle2, ArrowRight, Zap, Image as ImageIcon, Video, LayoutDashboard, LayoutTemplate, Copy, Check, Users } from 'lucide-react';
+import { Target, Activity, CheckCircle2, ArrowRight, Zap, Image as ImageIcon, Video, LayoutDashboard, LayoutTemplate, Copy, Check, Users, RotateCw } from 'lucide-react';
 import { 
   Phase0_CouncilResult,
   Phase05_AudienceBuilder,
@@ -49,7 +49,7 @@ export function EmptyState() {
   );
 }
 
-export function Phase0View({ data, onNext, hideNext = false }: { data: Phase0_CouncilResult; onNext?: () => void; hideNext?: boolean }) {
+export function Phase0View({ data, onNext, hideNext = false, onRebuild }: { data: Phase0_CouncilResult; onNext?: () => void; hideNext?: boolean; onRebuild?: () => void }) {
   if (!data) return <div className="p-8 text-center font-mono opacity-50">لا توجد بيانات متاحة للمرحلة 0.</div>;
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="max-w-4xl mx-auto space-y-8 pt-4 pb-12">
@@ -143,18 +143,27 @@ export function Phase0View({ data, onNext, hideNext = false }: { data: Phase0_Co
         </div>
       </div>
 
-      {!hideNext && onNext && (
-        <div className="flex justify-end pt-8 print-hide">
-          <button onClick={onNext} className="bg-black text-[#00FF41] px-8 py-4 font-bold text-lg uppercase flex items-center gap-3 transition-transform hover:-translate-y-1 hover:shadow-[4px_4px_0_#00FF41]">
+      <div className="flex flex-wrap items-center justify-between gap-4 pt-8 border-t-2 border-black/10 mt-8 print-hide">
+        {onRebuild && (
+          <button 
+            onClick={onRebuild}
+            className="border-2 border-black bg-white hover:bg-gray-100 text-black px-6 py-4 font-bold text-sm uppercase flex items-center gap-2 transition-transform hover:-translate-y-0.5"
+          >
+            <RotateCw size={18} />
+            <span>إعادة بناء هذه المرحلة (Phase 0) 🔄</span>
+          </button>
+        )}
+        {!hideNext && onNext && (
+          <button onClick={onNext} className="bg-black text-[#00FF41] px-8 py-4 font-bold text-lg uppercase flex items-center gap-3 transition-transform hover:-translate-y-1 hover:shadow-[4px_4px_0_#00FF41] ml-auto">
             الموافقة وبناء الجماهير (Phase 0.5) <ArrowRight size={24} className="rotate-180" />
           </button>
-        </div>
-      )}
+        )}
+      </div>
     </motion.div>
   );
 }
 
-export function Phase05View({ data, onNext, hideNext = false }: { data: Phase05_AudienceBuilder; onNext?: () => void; hideNext?: boolean }) {
+export function Phase05View({ data, onNext, hideNext = false, onRebuild }: { data: Phase05_AudienceBuilder; onNext?: () => void; hideNext?: boolean; onRebuild?: () => void }) {
   if (!data) return <div className="p-8 text-center font-mono opacity-50">لا توجد بيانات متاحة للمرحلة 0.5.</div>;
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="max-w-4xl mx-auto space-y-8 pt-4 pb-12">
@@ -250,18 +259,27 @@ export function Phase05View({ data, onNext, hideNext = false }: { data: Phase05_
          <div className="font-mono text-sm whitespace-pre-wrap">{data.instructions}</div>
       </div>
 
-      {!hideNext && onNext && (
-        <div className="flex justify-end pt-8 print-hide">
-          <button onClick={onNext} className="bg-black text-[#00FF41] px-8 py-4 font-bold text-lg uppercase flex items-center gap-3 transition-transform hover:-translate-y-1 hover:shadow-[4px_4px_0_#00FF41]">
+      <div className="flex flex-wrap items-center justify-between gap-4 pt-8 border-t-2 border-black/10 mt-8 print-hide">
+        {onRebuild && (
+          <button 
+            onClick={onRebuild}
+            className="border-2 border-black bg-white hover:bg-gray-100 text-black px-6 py-4 font-bold text-sm uppercase flex items-center gap-2 transition-transform hover:-translate-y-0.5"
+          >
+            <RotateCw size={18} />
+            <span>إعادة بناء هذه المرحلة (Phase 0.5) 🔄</span>
+          </button>
+        )}
+        {!hideNext && onNext && (
+          <button onClick={onNext} className="bg-black text-[#00FF41] px-8 py-4 font-bold text-lg uppercase flex items-center gap-3 transition-transform hover:-translate-y-1 hover:shadow-[4px_4px_0_#00FF41] ml-auto">
             الموافقة وبدء التحليل (Phase 1) <ArrowRight size={24} className="rotate-180" />
           </button>
-        </div>
-      )}
+        )}
+      </div>
     </motion.div>
   );
 }
 
-export function Phase1View({ data, onNext, hideNext = false }: { data: Phase1_Intelligence; onNext?: () => void; hideNext?: boolean }) {
+export function Phase1View({ data, onNext, hideNext = false, onRebuild }: { data: Phase1_Intelligence; onNext?: () => void; hideNext?: boolean; onRebuild?: () => void }) {
   if (!data) return <div className="p-8 text-center font-mono opacity-50">لا توجد بيانات متاحة للمرحلة 1.</div>;
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="max-w-4xl mx-auto space-y-8 pt-4 pb-12">
@@ -585,8 +603,18 @@ export function Phase1View({ data, onNext, hideNext = false }: { data: Phase1_In
 
       {!hideNext && (
         <div className="min-h-24 py-6 border-t-2 border-black flex flex-col sm:flex-row items-center justify-between px-8 bg-[#f2f2f2] mt-10 gap-4 printable-hide">
-          <div className="font-display font-bold text-xl uppercase tracking-tighter">اكتملت المرحلة 1. هل نتابع توليد البرومبتات (Nextify Briefs)؟</div>
-          <button onClick={onNext} className="px-10 py-4 bg-black text-white font-display font-bold text-lg uppercase tracking-wider border-2 border-black hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[4px_4px_0_#00FF41] transition-all flex items-center gap-3 shrink-0">
+          {onRebuild ? (
+            <button 
+              onClick={onRebuild}
+              className="border-2 border-black bg-white hover:bg-gray-100 text-black px-6 py-3 font-bold text-sm uppercase flex items-center gap-2 transition-transform hover:-translate-y-0.5"
+            >
+              <RotateCw size={18} />
+              <span>إعادة بناء وتحسين هذه المرحلة (Phase 1) 🔄</span>
+            </button>
+          ) : (
+            <div className="font-display font-bold text-xl uppercase tracking-tighter">اكتملت المرحلة 1. هل نتابع توليد البرومبتات (Nextify Briefs)؟</div>
+          )}
+          <button onClick={onNext} className="px-10 py-4 bg-black text-white font-display font-bold text-lg uppercase tracking-wider border-2 border-black hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[4px_4px_0_#00FF41] transition-all flex items-center gap-3 shrink-0 ml-auto">
             اعتماد <ArrowRight size={20} className="rotate-180" />
           </button>
         </div>
@@ -595,7 +623,7 @@ export function Phase1View({ data, onNext, hideNext = false }: { data: Phase1_In
   );
 }
 
-export function Phase2View({ data, onNext, hideNext = false }: { data: Phase2_StaticBriefs; onNext?: () => void; hideNext?: boolean }) {
+export function Phase2View({ data, onNext, hideNext = false, onRebuild }: { data: Phase2_StaticBriefs; onNext?: () => void; hideNext?: boolean; onRebuild?: () => void }) {
   if (!data) return <div className="p-8 text-center font-mono opacity-50">لا توجد بيانات متاحة للمرحلة 2.</div>;
   const getBriefCopyText = (brief: any) => {
     return `CONCEPT: ${brief.conceptName}
@@ -739,8 +767,18 @@ CTA: ${brief.adCopyFusha.cta}`;
 
       {!hideNext && (
         <div className="min-h-24 py-6 border-t-2 border-black flex flex-col sm:flex-row items-center justify-between px-8 bg-[#f2f2f2] mt-10 gap-4 printable-hide">
-          <div className="font-display font-bold text-xl uppercase tracking-tighter">اكتملت المرحلة 2. هل نتابع بناء Landing page (المرحلة 3)؟</div>
-          <button onClick={onNext} className="px-10 py-4 bg-black text-white font-display font-bold text-lg uppercase tracking-wider border-2 border-black hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[4px_4px_0_#00FF41] transition-all flex items-center gap-3 shrink-0">
+          {onRebuild ? (
+            <button 
+              onClick={onRebuild}
+              className="border-2 border-black bg-white hover:bg-gray-100 text-black px-6 py-3 font-bold text-sm uppercase flex items-center gap-2 transition-transform hover:-translate-y-0.5"
+            >
+              <RotateCw size={18} />
+              <span>إعادة بناء هذه المرحلة (Phase 2) 🔄</span>
+            </button>
+          ) : (
+            <div className="font-display font-bold text-xl uppercase tracking-tighter">اكتملت المرحلة 2. هل نتابع بناء Landing page (المرحلة 3)؟</div>
+          )}
+          <button onClick={onNext} className="px-10 py-4 bg-black text-white font-display font-bold text-lg uppercase tracking-wider border-2 border-black hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[4px_4px_0_#00FF41] transition-all flex items-center gap-3 shrink-0 ml-auto">
             اعتماد <ArrowRight size={20} className="rotate-180" />
           </button>
         </div>
@@ -749,7 +787,7 @@ CTA: ${brief.adCopyFusha.cta}`;
   );
 }
 
-export function Phase3View({ data, onNext, hideNext = false }: { data: Phase3_LandingPage; onNext?: () => void; hideNext?: boolean }) {
+export function Phase3View({ data, onNext, hideNext = false, onRebuild }: { data: Phase3_LandingPage; onNext?: () => void; hideNext?: boolean; onRebuild?: () => void }) {
   if (!data) return <div className="p-8 text-center font-mono opacity-50">لا توجد بيانات متاحة للمرحلة 3.</div>;
   const getSectionCopyText = (sec: any) => {
     return `SECTION ${sec.order}: ${sec.title} (${sec.section_type})
@@ -865,8 +903,18 @@ CTA: ${sec.cta_text}`;
 
       {!hideNext && (
         <div className="min-h-24 py-6 border-t-2 border-black flex flex-col sm:flex-row items-center justify-between px-8 bg-[#f2f2f2] mt-10 gap-4 printable-hide">
-          <div className="font-display font-bold text-xl uppercase tracking-tighter">اكتملت الصفحة (المرحلة 3). ننتقل إلى Video Workflow (المرحلة 4)؟</div>
-          <button onClick={onNext} className="px-10 py-4 bg-black text-white font-display font-bold text-lg uppercase tracking-wider border-2 border-black hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[4px_4px_0_#00FF41] transition-all flex items-center gap-3 shrink-0">اعتماد <ArrowRight size={20} className="rotate-180" /></button>
+          {onRebuild ? (
+            <button 
+              onClick={onRebuild}
+              className="border-2 border-black bg-white hover:bg-gray-100 text-black px-6 py-3 font-bold text-sm uppercase flex items-center gap-2 transition-transform hover:-translate-y-0.5"
+            >
+              <RotateCw size={18} />
+              <span>إعادة بناء هذه المرحلة (Phase 3) 🔄</span>
+            </button>
+          ) : (
+            <div className="font-display font-bold text-xl uppercase tracking-tighter">اكتملت الصفحة (المرحلة 3). ننتقل إلى Video Workflow (المرحلة 4)؟</div>
+          )}
+          <button onClick={onNext} className="px-10 py-4 bg-black text-white font-display font-bold text-lg uppercase tracking-wider border-2 border-black hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[4px_4px_0_#00FF41] transition-all flex items-center gap-3 shrink-0 ml-auto">اعتماد <ArrowRight size={20} className="rotate-180" /></button>
         </div>
       )}
     </motion.div>
@@ -874,7 +922,7 @@ CTA: ${sec.cta_text}`;
 }
 
 
-export function Phase4View({ data, onNext, hideNext = false }: { data: Phase4_VideoWorkflow; onNext?: () => void; hideNext?: boolean }) {
+export function Phase4View({ data, onNext, hideNext = false, onRebuild }: { data: Phase4_VideoWorkflow; onNext?: () => void; hideNext?: boolean; onRebuild?: () => void }) {
   if (!data) return <div className="p-8 text-center font-mono opacity-50">لا توجد بيانات متاحة للمرحلة 4.</div>;
   const getSceneCopyText = (scene: any) => {
     return `SCENE: ${scene.sceneName}
@@ -979,8 +1027,18 @@ ${scene.narrationFusha}`;
 
       {!hideNext && (
         <div className="min-h-24 py-6 border-t-2 border-black flex flex-col sm:flex-row items-center justify-between px-8 bg-[#f2f2f2] mt-10 gap-4 printable-hide">
-          <div className="font-display font-bold text-xl uppercase tracking-tighter">اكتملت المرحلة 4. هل نتابع استراتيجية الإعلانات (المرحلة 5)؟</div>
-          <button onClick={onNext} className="px-10 py-4 bg-black text-white font-display font-bold text-lg uppercase tracking-wider border-2 border-black hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[4px_4px_0_#00FF41] transition-all flex items-center gap-3 shrink-0">
+          {onRebuild ? (
+            <button 
+              onClick={onRebuild}
+              className="border-2 border-black bg-white hover:bg-gray-100 text-black px-6 py-3 font-bold text-sm uppercase flex items-center gap-2 transition-transform hover:-translate-y-0.5"
+            >
+              <RotateCw size={18} />
+              <span>إعادة بناء هذه المرحلة (Phase 4) 🔄</span>
+            </button>
+          ) : (
+            <div className="font-display font-bold text-xl uppercase tracking-tighter">اكتملت المرحلة 4. هل نتابع استراتيجية الإعلانات (المرحلة 5)؟</div>
+          )}
+          <button onClick={onNext} className="px-10 py-4 bg-black text-white font-display font-bold text-lg uppercase tracking-wider border-2 border-black hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[4px_4px_0_#00FF41] transition-all flex items-center gap-3 shrink-0 ml-auto">
             اعتماد <ArrowRight size={20} className="rotate-180" />
           </button>
         </div>
@@ -989,7 +1047,7 @@ ${scene.narrationFusha}`;
   );
 }
 
-export function Phase5View({ data, onNext, hideNext = false }: { data: Phase5_MetaAdsStrategy; onNext?: () => void; hideNext?: boolean }) {
+export function Phase5View({ data, onNext, hideNext = false, onRebuild }: { data: Phase5_MetaAdsStrategy; onNext?: () => void; hideNext?: boolean; onRebuild?: () => void }) {
   if (!data) return <div className="p-8 text-center font-mono opacity-50">لا توجد بيانات متاحة للمرحلة 5.</div>;
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-4xl mx-auto space-y-8 pt-4 pb-12">
@@ -1074,8 +1132,18 @@ export function Phase5View({ data, onNext, hideNext = false }: { data: Phase5_Me
 
       {!hideNext && (
         <div className="min-h-24 py-6 border-t-2 border-black flex flex-col sm:flex-row items-center justify-between px-8 bg-[#f2f2f2] mt-10 gap-4 printable-hide">
-          <div className="font-display font-bold text-xl uppercase tracking-tighter">اكتملت المرحلة 5. هل نتابع نظام التوسع (المرحلة 6)؟</div>
-          <button onClick={onNext} className="px-10 py-4 bg-black text-white font-display font-bold text-lg uppercase tracking-wider border-2 border-black hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[4px_4px_0_#00FF41] transition-all flex items-center gap-3 shrink-0">
+          {onRebuild ? (
+            <button 
+              onClick={onRebuild}
+              className="border-2 border-black bg-white hover:bg-gray-100 text-black px-6 py-3 font-bold text-sm uppercase flex items-center gap-2 transition-transform hover:-translate-y-0.5"
+            >
+              <RotateCw size={18} />
+              <span>إعادة بناء هذه المرحلة (Phase 5) 🔄</span>
+            </button>
+          ) : (
+            <div className="font-display font-bold text-xl uppercase tracking-tighter">اكتملت المرحلة 5. هل نتابع نظام التوسع (المرحلة 6)؟</div>
+          )}
+          <button onClick={onNext} className="px-10 py-4 bg-black text-white font-display font-bold text-lg uppercase tracking-wider border-2 border-black hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[4px_4px_0_#00FF41] transition-all flex items-center gap-3 shrink-0 ml-auto">
             اعتماد <ArrowRight size={20} className="rotate-180" />
           </button>
         </div>
@@ -1084,7 +1152,7 @@ export function Phase5View({ data, onNext, hideNext = false }: { data: Phase5_Me
   );
 }
 
-export function Phase6View({ data, onNext, hideNext }: { data: Phase6_ScalingSystem, onNext?: () => void, hideNext?: boolean }) {
+export function Phase6View({ data, onNext, hideNext, onRebuild }: { data: Phase6_ScalingSystem, onNext?: () => void, hideNext?: boolean, onRebuild?: () => void }) {
   if (!data) return <div className="p-8 text-center font-mono opacity-50">لا توجد بيانات متاحة للمرحلة 6.</div>;
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-4xl mx-auto space-y-8 pt-4 pb-12">
@@ -1112,18 +1180,27 @@ export function Phase6View({ data, onNext, hideNext }: { data: Phase6_ScalingSys
         </div>
       </div>
       
-      {!hideNext && onNext && (
-        <div className="pt-8 flex justify-end print-hide">
-          <button onClick={onNext} className="bg-black text-[#00FF41] hover:bg-[#00FF41] hover:text-black hover:border-black font-bold uppercase tracking-widest px-8 py-4 border-2 border-transparent transition-all">
+      <div className="flex flex-wrap items-center justify-between gap-4 pt-8 border-t-2 border-black/10 mt-8 print-hide">
+        {onRebuild && (
+          <button 
+            onClick={onRebuild}
+            className="border-2 border-black bg-white hover:bg-[#f2f2f2] text-black px-6 py-4 font-bold text-sm uppercase flex items-center gap-2 transition-transform hover:-translate-y-0.5"
+          >
+            <RotateCw size={18} />
+            <span>إعادة بناء هذه المرحلة (Phase 6) 🔄</span>
+          </button>
+        )}
+        {!hideNext && onNext && (
+          <button onClick={onNext} className="bg-black text-[#00FF41] hover:bg-[#00FF41] hover:text-black hover:border-black font-bold uppercase tracking-widest px-8 py-4 border-2 border-transparent transition-all ml-auto">
             توليد مولد الإعلانات (Phase 7) →
           </button>
-        </div>
-      )}
+        )}
+      </div>
     </motion.div>
   );
 }
 
-export function Phase7View_AdGenerator({ data }: { data: Phase7_AdGenerator }) {
+export function Phase7View_AdGenerator({ data, onRebuild }: { data: Phase7_AdGenerator, onRebuild?: () => void }) {
   if (!data) return <div className="p-8 text-center font-mono opacity-50">لا توجد بيانات متاحة للمرحلة 7.</div>;
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-6xl mx-auto space-y-8 pt-4 pb-12">
@@ -1212,6 +1289,17 @@ export function Phase7View_AdGenerator({ data }: { data: Phase7_AdGenerator }) {
           </div>
         ))}
       </div>
+      {onRebuild && (
+        <div className="flex justify-start pt-6 border-t-2 border-black/10 mt-8 print-hide">
+          <button 
+            onClick={onRebuild}
+            className="border-2 border-black bg-white hover:bg-gray-100 text-black px-6 py-4 font-bold text-sm uppercase flex items-center gap-2 transition-transform hover:-translate-y-0.5"
+          >
+            <RotateCw size={18} />
+            <span>إعادة بناء هذه المرحلة (Phase 7) 🔄</span>
+          </button>
+        </div>
+      )}
     </motion.div>
   );
 }

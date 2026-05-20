@@ -12,23 +12,68 @@ import {
 } from '../types';
 import { BILLIONAIRE_MINDSET_PROTOCOL } from './mindset';
 
+export function rotateKeys(): boolean {
+  if (typeof window === 'undefined') return false;
+  const keysStr = localStorage.getItem('nextify_api_keys');
+  if (keysStr) {
+    try {
+      const keys: string[] = JSON.parse(keysStr);
+      if (Array.isArray(keys) && keys.length > 1) {
+        const rotated = [...keys.slice(1), keys[0]];
+        localStorage.setItem('nextify_api_keys', JSON.stringify(rotated));
+        console.warn("Nextify Engine: Automatically rotated to next API Key due to error/limit.");
+        return true;
+      }
+    } catch (e) {
+      console.error("Error rotating keys:", e);
+    }
+  }
+  return false;
+}
+
 export function getAiClient() {
-  const keys = localStorage.getItem('nextify_api_keys');
-  const apiKey = keys ? JSON.parse(keys)[0] : process.env.GEMINI_API_KEY;
-  if (!apiKey) throw new Error("API Key configuration error.");
+  const keysStr = localStorage.getItem('nextify_api_keys');
+  let apiKey: string | undefined;
+  if (keysStr) {
+    try {
+      const parsed = JSON.parse(keysStr);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        apiKey = parsed[0];
+      }
+    } catch (e) {
+      console.error("Error parsing nextify_api_keys:", e);
+    }
+  }
+  if (!apiKey) {
+    apiKey = process.env.GEMINI_API_KEY;
+  }
+  if (!apiKey) {
+    throw new Error("يرجى إدخال مفتاح API واحد على الأقل لـ Gemini في 'إعدادات النظام' المتاحة في القائمة الجانبية لتنشيط الذكاء الاصطناعي.");
+  }
   return new GoogleGenAI({ apiKey });
 }
 
-// استخدام getAiClient() بدلاً من ai مباشر في الدوال
-
-export let currentModel = 'gemini-3.1-flash-lite-preview';
+export let currentModel = 'gemini-3.5-flash';
 export function setModel(newModel: string) { currentModel = newModel; }
 
-// Retry mechanism with exponential backoff
+// Retry mechanism with exponential backoff and API Key auto-rotation
 async function withRetry<T>(fn: () => Promise<T>, retries = 3, delay = 1000): Promise<T> {
   try {
     return await fn();
   } catch (error: any) {
+    const errMsg = String(error?.message || error || '').toLowerCase();
+    const isApiKeyError = 
+      error?.code === 429 || error?.status === 429 ||
+      error?.code === 400 || error?.status === 400 ||
+      error?.code === 403 || error?.status === 403 ||
+      errMsg.includes('api key') || errMsg.includes('quota') || errMsg.includes('limit') || errMsg.includes('key');
+
+    if (isApiKeyError && rotateKeys()) {
+      // Small pause before retrying with the new key
+      await new Promise(resolve => setTimeout(resolve, 500));
+      return withRetry(fn, retries, delay);
+    }
+
     if (retries > 0 && (error?.code === 429 || error?.status === 429)) {
       console.warn(`Quota exceeded, retrying in ${delay}ms...`);
       await new Promise(resolve => setTimeout(resolve, delay));
@@ -1006,7 +1051,7 @@ ${phase1Data ? `[السياق الكامل من التحليل]: ${JSON.stringif
   return JSON.parse(sanitizeOutput(response.text!)) as Phase7_AdGenerator;
 }
 
-export async function checkSpellingAndGrammar(text: string, model: string = 'gemini-3.1-flash-lite-preview'): Promise<string> {
+export async function checkSpellingAndGrammar(text: string, model: string = 'gemini-3.5-flash'): Promise<string> {
   const response = await withRetry(() => getAiClient().models.generateContent({
     model: model,
     contents: [{ text: `قم بتصحيح الأخطاء الإملائية والنحوية للنص التالي بالدارجة الجزائرية أو العربية الفصحى (حسب السياق) مع الحفاظ على الأسلوب التسويقي المقنع. لا تضف أي نص آخر، أخرج النص المصحح فقط:\n\n${text}` }],

@@ -15,6 +15,28 @@ export function Composer({ onSendMessage, isLoading, disabled = false, isConfirm
   const [images, setImages] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Load saved state on mount
+  React.useEffect(() => {
+    try {
+      const saved = localStorage.getItem('nextify_retained_composer');
+      if (saved) {
+        const { input: savedInput, sellingPrice: savedPrice, images: savedImages } = JSON.parse(saved);
+        if (savedInput) setInput(savedInput);
+        if (savedPrice) setSellingPrice(savedPrice);
+        if (savedImages && Array.isArray(savedImages)) setImages(savedImages);
+      }
+    } catch (e) {
+      console.error("Failed to load saved state", e);
+    }
+  }, []);
+
+  // Save changes to localStorage on any input/price/images change
+  React.useEffect(() => {
+    if (!isConfirming) {
+      localStorage.setItem('nextify_retained_composer', JSON.stringify({ input, sellingPrice, images }));
+    }
+  }, [input, sellingPrice, images, isConfirming]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (input.trim() && !isLoading && !disabled) {
