@@ -23,7 +23,10 @@ import {
   ArrowLeftRight, 
   Smartphone,
   Sparkles,
-  Award
+  Award,
+  History,
+  Clock,
+  ShieldAlert
 } from 'lucide-react';
 
 interface BackupLog {
