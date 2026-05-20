@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: kerkacem-market-ads
+    runtime: node
+    repo: https://github.com/Kerkacem/kerkacem-market-ads
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: APP_URL
+        fromService:
+          name: kerkacem-market-ads
+          type: web
+          property: url
