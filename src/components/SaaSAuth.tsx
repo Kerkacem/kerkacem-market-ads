@@ -3,9 +3,9 @@ import { useAuth } from '../context/AuthContext';
 import { motion } from 'motion/react';
 import { Mail, Lock, User, KeyRound, ArrowLeft, Terminal, ShieldAlert } from 'lucide-react';
 
-export function SaaSAuth({ onBackToLanding }: { onBackToLanding?: () => void }) {
+export function SaaSAuth({ onBackToLanding, initialIsLogin = true }: { onBackToLanding?: () => void; initialIsLogin?: boolean }) {
   const { login, signup, serverDbAvailable } = useAuth();
-  const [isLogin, setIsLogin] = useState(true);
+  const [isLogin, setIsLogin] = useState(initialIsLogin);
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -71,7 +71,7 @@ export function SaaSAuth({ onBackToLanding }: { onBackToLanding?: () => void }) 
         {/* Branding Title */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-black tracking-tight text-black font-sans">
-            NEXTIFY <span className="bg-[#00FF41] px-1.5 border border-black text-black">SAAS</span>
+            MARKETING MASTER <span className="bg-[#00FF41] px-1.5 border border-black text-black">SAAS</span>
           </h1>
           <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mt-2 font-mono">
             نظام الذكاء الإعلاني المتكامل للجزائر
@@ -118,7 +118,7 @@ export function SaaSAuth({ onBackToLanding }: { onBackToLanding?: () => void }) 
               <input 
                 type="email"
                 required
-                placeholder="yasin@nextify.dz"
+                placeholder="yasin@marketingmaster.dz"
                 className="w-full p-2.5 pr-10 border-2 border-black focus:outline-none focus:bg-[#00FF41]/5 text-sm font-bold bg-[#fafafa]"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}

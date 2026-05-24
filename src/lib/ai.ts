@@ -21,7 +21,7 @@ export function rotateKeys(): boolean {
       if (Array.isArray(keys) && keys.length > 1) {
         const rotated = [...keys.slice(1), keys[0]];
         localStorage.setItem('nextify_api_keys', JSON.stringify(rotated));
-        console.warn("Nextify Engine: Automatically rotated to next API Key due to error/limit.");
+        console.warn("MARKETING MASTER Engine: Automatically rotated to next API Key due to error/limit.");
         return true;
       }
     } catch (e) {
@@ -45,7 +45,7 @@ export function getAiClient() {
     }
   }
   if (!apiKey) {
-    apiKey = process.env.GEMINI_API_KEY;
+    apiKey = typeof process !== 'undefined' ? process.env?.GEMINI_API_KEY : undefined;
   }
   if (!apiKey) {
     throw new Error("يرجى إدخال مفتاح API واحد على الأقل لـ Gemini في 'إعدادات النظام' المتاحة في القائمة الجانبية لتنشيط الذكاء الاصطناعي.");
@@ -862,7 +862,7 @@ export async function runPhase3(phase1Data: Phase1_Intelligence, phase2Data?: Ph
   };
 
   const lpInstructions = `
-Tu es un expert media buyer + copywriter + directeur artistique. Ta mission : produire un brief landing page ULTRA-COMPLET (Landing Page Classic + Claude Nextify LP Gold Standard v2) au format JSON structuré.
+Tu es un expert media buyer + copywriter + directeur artistique. Ta mission : produire un brief landing page ULTRA-COMPLET (Landing Page Classic + Claude MARKETING MASTER LP Gold Standard v2) au format JSON structuré.
 
 Règles de workflow :
 1. Comprendre le produit (utilise le contexte fourni).
@@ -892,7 +892,7 @@ Ajoute OBLIGATOIREMENT dans le prompt de l'image (Text Layout Requirements) : "[
   let briefsContext = "";
   if (phase2Data) {
     briefsContext = `
-[معلومات الـ 5 Nextify Static Briefs المصممة في المرحلة 2]:
+[معلومات الـ 5 MARKETING MASTER Static Briefs المصممة في المرحلة 2]:
 استخدم هذه المفاهيم البصرية الـ 5 المجهزة مسبقاً وتفاصيلها لدمجها بانسجام دائم في الأقسام الستة (الـ 6 sections بالتوالي) لصفحة الهبوط لتكون هناك وحدة تصميمية وبصرية كاملة بين الإعلان وصفحة الهبوط:
 ${phase2Data.briefs.map((b, i) => `المفهوم البصري ${i+1}: ${b.conceptName} (الزاوية: ${b.psychoAngle}) - العنوان الرئيسي للإعلان: "${b.textLayout?.headline}"`).join("\n")}
 `;

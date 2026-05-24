@@ -177,7 +177,7 @@ export function SaaSAdmin({ onBackToDashboard }: SaaSAdminProps) {
             </div>
             <h1 className="text-3xl font-black text-black">إدارة المستخدمين وعمليات المنصة</h1>
             <p className="text-xs text-gray-400 mt-1 font-bold uppercase tracking-wider font-mono">
-              Nextify SaaS Administrator Control Desk
+              MARKETING MASTER SaaS Administrator Control Desk
             </p>
           </div>
           <button 
@@ -307,7 +307,7 @@ export function SaaSAdmin({ onBackToDashboard }: SaaSAdminProps) {
 
         {/* Brand Copyright & Designer Signature Footer */}
         <div className="mt-12 pt-6 border-t border-black/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-bold text-gray-400" dir="rtl">
-          <span>حقوق النشر © {new Date().getFullYear()} Nextify SaaS الجزائر. جميع الحقوق محفوظة.</span>
+          <span>حقوق النشر © {new Date().getFullYear()} MARKETING MASTER SaaS الجزائر. جميع الحقوق محفوظة.</span>
           <div className="flex items-center gap-1.5 text-black">
             <span>طُور وتصمم بواسطة:</span>
             <span className="bg-black text-[#00FF41] px-2 py-0.5 border border-black font-extrabold uppercase font-mono tracking-wider">

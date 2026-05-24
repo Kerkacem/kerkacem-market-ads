@@ -109,7 +109,7 @@ export function SaaSWhiteLabel({ onGoToPricing }: SaaSWhiteLabelProps) {
             <span>تخصيص العلامة التجارية للوكالة والتقارير الموجهة لعملائك</span>
           </h3>
           <p className="text-xs text-gray-500 font-bold mt-1 max-w-2xl leading-relaxed">
-            امسح شعار وموقع Nextify بالكامل من تقارير وموجزات الاستخبارات التسويقية التي ترسلها لعملائك. استبدلها بنطاق عملك الخاص، شعارك، وألوان هويتك البصرية الخاصة.
+            امسح شعار وموقع MARKETING MASTER بالكامل من تقارير وموجزات الاستخبارات التسويقية التي ترسلها لعملائك. استبدلها بنطاق عملك الخاص، شعارك، وألوان هويتك البصرية الخاصة.
           </p>
         </div>
       </div>
@@ -129,7 +129,7 @@ export function SaaSWhiteLabel({ onGoToPricing }: SaaSWhiteLabelProps) {
             </p>
             
             <div className="bg-gray-50 border border-black p-4 text-right text-[11px] text-gray-700 max-w-sm mx-auto space-y-1.5">
-              <p className="flex justify-between"><span>• إخفاء علامة Nextify المائية</span> <span className="text-green-600 font-black">جاهز للتفعيل</span></p>
+              <p className="flex justify-between"><span>• إخفاء علامة MARKETING MASTER المائية</span> <span className="text-green-600 font-black">جاهز للتفعيل</span></p>
               <p className="flex justify-between"><span>• نطاق فرعي مخصص (reports.yourdomain.dz)</span> <span className="text-green-600 font-black">جاهز للتفعيل</span></p>
               <p className="flex justify-between"><span>• تخصيص الألوان واللوجو للعملاء</span> <span className="text-green-600 font-black">جاهز للتفعيل</span></p>
             </div>
@@ -287,7 +287,7 @@ export function SaaSWhiteLabel({ onGoToPricing }: SaaSWhiteLabelProps) {
                   <p className="font-bold text-black border-b pb-1 flex items-center gap-1"><HelpCircle size={12} /> طريقة إعداد DNS للنطاق الخاص بك:</p>
                   <p>1. اذهب للوحة تحكم النطاق (Namecheap, Cloudflare, Nic.dz).</p>
                   <p>2. أضف سجل <strong className="text-black">CNAME</strong> فريد باسم النطاق الذي اخترته.</p>
-                  <p>3. وجه السجل إلى القيمة التالية: <code className="bg-gray-100 border px-1 font-mono text-black select-all">custom.nextify-saas.net</code></p>
+                  <p>3. وجه السجل إلى القيمة التالية: <code className="bg-gray-100 border px-1 font-mono text-black select-all">custom.marketingmaster-saas.net</code></p>
                 </div>
               </div>
 
@@ -333,7 +333,7 @@ export function SaaSWhiteLabel({ onGoToPricing }: SaaSWhiteLabelProps) {
                       </div>
                     ) : (
                       <div className="flex items-center gap-2">
-                        <span className="bg-[#00FF41] text-black border border-black font-bold uppercase text-[9px] px-1">NEXTIFY</span>
+                        <span className="bg-[#00FF41] text-black border border-black font-bold uppercase text-[8px] px-1">MARKETING MASTER</span>
                         <span className="text-[9px] text-gray-400 font-mono">SAAS INTERFACE</span>
                       </div>
                     )}
@@ -367,14 +367,14 @@ export function SaaSWhiteLabel({ onGoToPricing }: SaaSWhiteLabelProps) {
                   {/* Watermark watermark at the end of layouts */}
                   {!settings.removeWatermark && (
                     <div className="absolute bottom-2 left-2 text-[8px] text-gray-400 font-mono uppercase bg-white border px-1 border-dashed tracking-widest">
-                      Powered by Nextify SaaS الجزائر
+                      Powered by MARKETING MASTER SaaS الجزائر
                     </div>
                   )}
                 </div>
               </div>
 
               <div className="mt-6 p-4.5 bg-amber-50 border border-amber-500 text-[10px] font-bold text-amber-900 leading-normal">
-                عند تفضيل خيار <strong>حذف العلامة المائية</strong> وحفظ التعديلات، سيتم مسح أي إشارة لموقع Nextify من لوحة PDF المصدرة، ومن كافة روابط الاستعراض المجانية المخصصة للروابط.
+                عند تفضيل خيار <strong>حذف العلامة المائية</strong> وحفظ التعديلات، سيتم مسح أي إشارة لموقع MARKETING MASTER من لوحة PDF المصدرة، ومن كافة روابط الاستعراض المجانية المخصصة للروابط.
               </div>
             </div>
           </div>

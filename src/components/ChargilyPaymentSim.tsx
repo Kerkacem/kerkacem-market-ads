@@ -93,7 +93,7 @@ export function ChargilyPaymentSim({ userId, plan, amount, onPaymentSuccess, onP
         <div className="flex justify-between items-center mb-6 pb-4 border-b-2 border-black">
           <div className="flex items-center gap-2">
             <Landmark size={20} className="text-black" />
-            <span className="font-mono font-black text-xs tracking-wider text-black">NEXTIFY BILLING desk</span>
+            <span className="font-mono font-black text-xs tracking-wider text-black">MARKETING MASTER BILLING desk</span>
           </div>
           <div className="text-left font-sans">
             <span className="text-[10px] font-mono font-bold bg-[#00FF41] text-black px-2 py-0.5 border border-black rounded-sm">

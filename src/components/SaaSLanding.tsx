@@ -26,6 +26,7 @@ import { ProjectData } from '../App';
 import { SaaSTeamManager } from './SaaSTeamManager';
 import { SaaSWhiteLabel } from './SaaSWhiteLabel';
 import { SaaSEnterprisePortal } from './SaaSEnterprisePortal';
+import { SaaSMarketingHub } from './SaaSMarketingHub';
 
 interface SaaSLandingProps {
   onSelectProject: (proj: ProjectData) => void;
@@ -47,7 +48,7 @@ export function SaaSLanding({
   onCreateNewProjectTrigger
 }: SaaSLandingProps) {
   const { user, logout, serverDbAvailable, updateProfile, updateGeminiKey } = useAuth();
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'analytics' | 'profile' | 'team' | 'whitelabel' | 'enterprise_portal'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'analytics' | 'profile' | 'team' | 'whitelabel' | 'enterprise_portal' | 'marketing_hub'>('dashboard');
   
   // Profile settings state
   const [fullNameInput, setFullNameInput] = useState(user?.fullName || '');
@@ -63,6 +64,16 @@ export function SaaSLanding({
     { code: '09', name: 'البليدة', orders: 72, ctr: '4.1%', color: 'bg-green-400' },
     { code: '35', name: 'بومرداس', orders: 45, ctr: '3.1%', color: 'bg-amber-400' },
   ]);
+
+  // COD ROI Forecast Dashboard State Variables (Algeria B2B SaaS 2026 Strategy)
+  const [roiAdsSpend, setRoiAdsSpend] = useState<number>(10000); // DZD
+  const [roiSourcingCost, setRoiSourcingCost] = useState<number>(1200); // DZD
+  const [roiSalePrice, setRoiSalePrice] = useState<number>(3900); // DZD
+  const [roiDeliveryRate, setRoiDeliveryRate] = useState<number>(65); // %
+  const [roiShippingFee, setRoiShippingFee] = useState<number>(750); // DZD
+  const [roiConfirmFee, setRoiConfirmFee] = useState<number>(150); // DZD
+  const [roiReturnPenalty, setRoiReturnPenalty] = useState<number>(400); // DZD
+  const [roiCpa, setRoiCpa] = useState<number>(800); // DZD
 
   useEffect(() => {
     if (user) {
@@ -104,7 +115,7 @@ export function SaaSLanding({
         <div>
           <div className="mb-8">
             <h2 className="text-2xl font-black text-black tracking-tighter flex items-center gap-2">
-              NEXTIFY <span className="bg-[#00FF41] px-1 py-0.5 border border-black text-xs">SAAS</span>
+              MARKETING MASTER <span className="bg-[#00FF41] px-1 py-0.5 border border-black text-xs">SAAS</span>
             </h2>
             <p className="text-[10px] font-mono font-bold text-gray-400 tracking-wider uppercase mt-1">Core Engine Workspace</p>
           </div>
@@ -134,6 +145,19 @@ export function SaaSLanding({
                 <span>إحصائيات وتحليلات القيمة</span>
               </span>
               <span className="text-[9px] bg-red-400 text-white font-mono px-1.5 py-0.5 rounded-sm">شائع (DZ)</span>
+            </button>
+
+            <button 
+              onClick={() => setActiveTab('marketing_hub')}
+              className={`w-full text-right py-3 px-4 border-2 border-black font-black text-xs flex items-center justify-between transition-all ${
+                activeTab === 'marketing_hub' ? 'bg-[#c084fc] text-black shadow-[4px_4px_0_rgba(0,0,0,1)]' : 'bg-white text-black hover:bg-gray-50'
+              }`}
+            >
+              <span className="flex items-center gap-2">
+                <Target size={16} className="text-purple-950 shrink-0" />
+                <span className="text-neutral-900 font-extrabold text-xs">مركز التجسس والأدوات الذكية</span>
+              </span>
+              <span className="text-[9px] bg-purple-600 text-white font-mono px-1.5 py-0.5 font-bold rounded-xs">جديد ⭐️</span>
             </button>
 
             <button 
@@ -219,7 +243,7 @@ export function SaaSLanding({
         <div className="pt-6 border-t font-sans space-y-4">
           <div className="flex items-center gap-3">
             <img 
-              src={user?.avatarUrl || `https://api.dicebear.com/7.x/bottts/svg?seed=Nextify`} 
+              src={user?.avatarUrl || `https://api.dicebear.com/7.x/bottts/svg?seed=MarketingMaster`} 
               alt={user?.fullName} 
               className="w-10 h-10 border border-black bg-gray-100"
             />
@@ -399,63 +423,272 @@ export function SaaSLanding({
         )}
 
         {activeTab === 'analytics' && (
-          <div className="space-y-8">
-            <div className="bg-white border-3 border-black p-6 shadow-[8px_8px_0_rgba(0,0,0,1)]">
-              <h3 className="text-lg font-black text-black mb-4 flex items-center gap-2">
-                <Globe size={20} />
-                <span>تحليل مبيعات الولايات الـ 58 (COD Algeria Breakdown)</span>
-              </h3>
-              <p className="text-xs text-gray-500 mb-6 font-semibold">
-                يقوم النظام بالربط مع تحليلات ميتا وسجلات التوصيل (Yalidine / ZR) لاستخلاص نسب النقر الإجمالية لمنتجاتك الأكثر مبيعاً:
-              </p>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                
-                {/* Custom table widget */}
-                <div className="space-y-4">
-                  <h4 className="text-xs font-black text-black uppercase tracking-wider">الولايات الأعلى أداءً (High conversion Wilayas)</h4>
-                  <div className="space-y-3">
-                    {wilayaStats.map((st) => (
-                      <div key={st.code} className="p-3 border-2 border-black bg-gray-50 flex justify-between items-center text-xs">
-                        <div>
-                          <span className="font-mono bg-black text-white px-1.5 py-0.5 rounded-sm text-[9px] inline-block mr-2">{st.code}</span>
-                          <span className="font-black text-black">{st.name}</span>
-                        </div>
-                        <div className="flex gap-4 font-mono font-bold">
-                          <span>الطلبات: {st.orders}</span>
-                          <span className="text-green-600 bg-green-50 border border-green-200 px-1 py-0.2">CTR: {st.ctr}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+          <div className="space-y-8" dir="rtl">
+            
+            {/* Main Header with Algerian Flag indicator */}
+            <div className="bg-white border-3 border-black p-6 shadow-[8px_8px_0_rgba(0,0,0,1)] relative overflow-hidden">
+              <div className="absolute top-0 right-0 left-0 h-1.5 bg-gradient-to-r from-green-600 via-white to-red-600" />
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                  <span className="text-[9px] font-mono font-black text-black bg-[#ffe8ca] border border-black px-2 py-0.5 uppercase tracking-wide inline-block mb-1.5 rounded-sm">
+                    أدوات التخطيط المالي المتطورة لعام 2026
+                  </span>
+                  <h3 className="text-xl font-black text-black flex items-center gap-2">
+                    <Globe size={22} className="text-green-600 shrink-0" />
+                    <span>محاكي العائد على الاستثمار وحساب الأرباح التفاعلي (MARKETING MASTER COD ROI Forecast Engine)</span>
+                  </h3>
+                  <p className="text-xs text-gray-500 font-bold mt-1 leading-relaxed max-w-3xl">
+                    خطط لنجاح مشاريعك الإضافية في الجزائر بثقة تامة. يدمج هذا المخطط الذكي تكاليف الإعلانات الحقيقية (DZD)، سعر السورسينغ بالجملة، مصاريف الشحن لشركة يالادين (Yalidine) أو ZR، مصاريف تأكيد مركز الاتصال، ونسب الاسترجاع (Returns) لتوفير دقة تامة لصنع قرارك المالي.
+                  </p>
                 </div>
-
-                {/* Animated visual graphics chart crafted in Tailwind CSS */}
-                <div className="border-2 border-black p-5 flex flex-col justify-between bg-white relative">
-                  <div>
-                    <h4 className="text-xs font-black text-black uppercase tracking-wider mb-2">منحنى النقر والإنفاق الأسبوعي</h4>
-                    <p className="text-[10px] text-gray-400 font-semibold mb-4">متوسط الأداء المسترجع عبر الذكاء الاصطناعي</p>
-                  </div>
-                  
-                  {/* Tailwind custom bars graph */}
-                  <div className="h-44 flex items-end justify-between gap-2 px-2 pb-2 mr-4 border-b border-black text-xs font-mono font-bold relative">
-                    <div className="w-8 bg-[#00FF41] border border-black h-[40%] flex justify-center hover:scale-105 transition-transform"><span className="absolute -top-6 text-[10px]">1.2%</span></div>
-                    <div className="w-8 bg-[#00FF41] border border-black h-[60%] flex justify-center hover:scale-105 transition-transform"><span className="absolute -top-6 text-[10px]">2.5%</span></div>
-                    <div className="w-8 bg-[#22c55e] border border-black h-[85%] flex justify-center hover:scale-105 transition-transform"><span className="absolute -top-6 text-[10px]">4.1%</span></div>
-                    <div className="w-8 bg-[#16a34a] border border-black h-[95%] flex justify-center hover:scale-105 transition-transform"><span className="absolute -top-6 text-[10px]">4.9%</span></div>
-                    <div className="w-8 bg-[#15803d] border border-black h-[70%] flex justify-center hover:scale-105 transition-transform"><span className="absolute -top-6 text-[10px]">3.2%</span></div>
-                  </div>
-                  <div className="flex justify-between px-2 pt-2 font-mono text-[9px] text-gray-400 font-bold">
-                    <span>سبت</span>
-                    <span>أحد</span>
-                    <span>اثنين</span>
-                    <span>ثلاثاء</span>
-                    <span>أربعاء</span>
-                  </div>
-                </div>
-
               </div>
             </div>
+
+            {/* Calculations & Formulas block */}
+            {(() => {
+              const calculatedOrders = roiCpa > 0 ? Math.floor(roiAdsSpend / roiCpa) : 0;
+              const calculatedDelivered = Math.floor(calculatedOrders * (roiDeliveryRate / 100));
+              const calculatedFailed = Math.max(0, calculatedOrders - calculatedDelivered);
+              const calculatedSourcingCost = calculatedDelivered * roiSourcingCost;
+              const calculatedCallCenterCost = calculatedOrders * roiConfirmFee;
+              const calculatedShippingCost = (calculatedDelivered * roiShippingFee) + (calculatedFailed * roiReturnPenalty);
+              
+              const calculatedGrossRevenue = calculatedDelivered * roiSalePrice;
+              const calculatedTotalCosts = calculatedSourcingCost + calculatedShippingCost + calculatedCallCenterCost + roiAdsSpend;
+              const calculatedNetProfit = calculatedGrossRevenue - calculatedTotalCosts;
+              const calculatedRoi = calculatedTotalCosts > 0 ? (calculatedNetProfit / calculatedTotalCosts) * 105 : 0; 
+
+              const deliveryPct = roiDeliveryRate / 100;
+              const calculatedBreakEvenCpa = Math.max(0, deliveryPct * (roiSalePrice - roiSourcingCost - roiShippingFee) - (1 - deliveryPct) * roiReturnPenalty - roiConfirmFee);
+              const calculatedSafeTargetCpa = Math.round(calculatedBreakEvenCpa * 0.7);
+
+              let alertText = "";
+              let alertType: 'danger' | 'warning' | 'success' | 'info' = 'info';
+              
+              if (roiDeliveryRate < 45) {
+                alertText = `⚠️ تحذير صارم: نسبة التوصيل منخفضة جداً (${roiDeliveryRate}%)! أنت تسجل معدل استرجاع مرتفع (${100 - roiDeliveryRate}%) وتخسر نقوداً طائلة في تغطية شحن العودة وتأكيد مركز الاتصال. يرجى توجيه فريقك لتنظيف فوري للجماهير وقائمة المستلمين المستهدفة.`;
+                alertType = 'danger';
+              } else if (calculatedNetProfit < 0) {
+                alertText = `💸 خسارة مالية متوقعة: صافي الأرباح سلبي بحوالي (${Math.round(calculatedNetProfit).toLocaleString('ar-DZ')} دج). نوصيك بزيادة سعر بيع منتجك النهائي أو البحث عن مورد آخر يمنحك أسعار جملة أقل، أو تحسين جودة الإبداع لخفض سعر الـ CPA.`;
+                alertType = 'warning';
+              } else if (calculatedRoi > 80) {
+                alertText = `🔥 منجم ذهب حقيقي! العائد المتوقع استثنائي ويتجاوز الحدود الآمنة (${Math.round(calculatedRoi)}%). هذا المنتج يمتلك ملاءمة مثالية لنمط حياة المستهلك الجزائري الحالي. ضاعف ميزانتك على الحملات الفائزة وباشر بالتوسع السريع!`;
+                alertType = 'success';
+              } else {
+                alertText = `📊 أداء متزن ومستقر: مبيعاتك تحقق هامش ربح آمن وجيد للعمل بالجزائر. واصل العمل بحذر وحافظ على سرعة شحن الطلبيات ومتابعتها عبر Yalidine لضمان التدفق السلس للسيولة النقدية (Cash Flow).`;
+                alertType = 'info';
+              }
+
+              return (
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                  
+                  {/* SLIDERS & CONTROLS CABINET */}
+                  <div className="lg:col-span-5 bg-white border-2 border-black p-5 shadow-[4px_4px_0_rgba(0,0,0,1)] space-y-5">
+                    <h4 className="text-xs font-black text-black border-b border-black pb-2 mb-3 flex items-center gap-1.5">
+                      <span>⚙️ معطيات ومؤشرات التشغيل بالدينار (DZD)</span>
+                    </h4>
+
+                    {/* Ad Spend & CPA */}
+                    <div className="space-y-4">
+                      <div>
+                        <div className="flex justify-between text-[11px] font-black text-black mb-1">
+                          <span>الميزانية الإعلانية اليومية:</span>
+                          <span className="font-mono text-green-700">{roiAdsSpend.toLocaleString('ar-DZ')} دج / يوم</span>
+                        </div>
+                        <input 
+                          type="range" 
+                          min={2000} 
+                          max={100000} 
+                          step={1000}
+                          value={roiAdsSpend} 
+                          onChange={(e) => setRoiAdsSpend(Number(e.target.value))}
+                          className="w-full accent-black cursor-pointer"
+                        />
+                      </div>
+
+                      <div>
+                        <div className="flex justify-between text-[11px] font-black text-black mb-1">
+                          <span>تكلفة الحصول على طلبية (Meta Ads CPA):</span>
+                          <span className="font-mono text-red-650">{roiCpa.toLocaleString('ar-DZ')} دج / طلب</span>
+                        </div>
+                        <input 
+                          type="range" 
+                          min={200} 
+                          max={5000} 
+                          step={50}
+                          value={roiCpa} 
+                          onChange={(e) => setRoiCpa(Number(e.target.value))}
+                          className="w-full accent-black cursor-pointer"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[10px] font-black text-gray-500 mb-1">سعر المورد بالجملة:</label>
+                          <input 
+                            type="number"
+                            value={roiSourcingCost}
+                            onChange={(e) => setRoiSourcingCost(Math.max(0, Number(e.target.value)))}
+                            className="w-full p-2 border-2 border-black font-mono font-bold text-xs bg-gray-50"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-black text-gray-500 mb-1">سعر بيع المنتج النهائي:</label>
+                          <input 
+                            type="number"
+                            value={roiSalePrice}
+                            onChange={(e) => setRoiSalePrice(Math.max(0, Number(e.target.value)))}
+                            className="w-full p-2 border-2 border-black font-mono font-bold text-xs bg-gray-50"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="flex justify-between text-[11px] font-black text-black mb-1">
+                          <span>نسبة تسليم وتوصيل يالادين (Delivery Rate):</span>
+                          <span className="font-mono text-indigo-700">{roiDeliveryRate}%</span>
+                        </div>
+                        <input 
+                          type="range" 
+                          min={20} 
+                          max={100} 
+                          step={1}
+                          value={roiDeliveryRate} 
+                          onChange={(e) => setRoiDeliveryRate(Number(e.target.value))}
+                          className="w-full accent-indigo-600 cursor-pointer"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-2 pt-2 border-t border-dashed">
+                        <div>
+                          <label className="block text-[9px] font-bold text-gray-400 mb-0.5">تكلفة التوصيل ( Yalidine ):</label>
+                          <input 
+                            type="number"
+                            value={roiShippingFee}
+                            onChange={(e) => setRoiShippingFee(Math.max(0, Number(e.target.value)))}
+                            className="w-full p-1 border border-black font-mono font-bold text-xs"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[9px] font-bold text-gray-400 mb-0.5">عمولات التأكيد (Call Center):</label>
+                          <input 
+                            type="number"
+                            value={roiConfirmFee}
+                            onChange={(e) => setRoiConfirmFee(Math.max(0, Number(e.target.value)))}
+                            className="w-full p-1 border border-black font-mono font-bold text-xs"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[9px] font-bold text-gray-400 mb-0.5">غرامة التوصيل الملغي (Return):</label>
+                          <input 
+                            type="number"
+                            value={roiReturnPenalty}
+                            onChange={(e) => setRoiReturnPenalty(Math.max(0, Number(e.target.value)))}
+                            className="w-full p-1 border border-black font-mono font-bold text-xs"
+                          />
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+
+                  {/* FINANCIAL METRICS DISPLAY SCREEN */}
+                  <div className="lg:col-span-7 space-y-6">
+                    
+                    {/* Dynamic Alert Banner */}
+                    <div className={`p-4 border-2 border-black font-semibold text-xs leading-relaxed ${
+                      alertType === 'danger' ? 'bg-red-50 border-red-500 text-red-900' :
+                      alertType === 'warning' ? 'bg-amber-50 border-amber-500 text-amber-900' :
+                      alertType === 'success' ? 'bg-[#e6ffe6] border-green-500 text-green-900' :
+                      'bg-indigo-50 border-indigo-500 text-indigo-900'
+                    }`}>
+                      <p className="font-black mb-1 shadow-sm">💡 تشخيص ذكاء النظام المالي من كرباني بلقاسم:</p>
+                      <p className="text-[11px] font-bold">{alertText}</p>
+                    </div>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                      
+                      <div className="bg-white border-2 border-black p-3.5 shadow-[4px_4px_0_rgba(0,0,0,1)] relative">
+                        <span className="text-[9px] font-bold text-gray-400 block">إجمالي المبيعات المستلمة</span>
+                        <span className="text-xl font-black text-black mt-1 block font-mono">
+                          {calculatedDelivered} <span className="text-xs text-gray-400">/ {calculatedOrders} طلبيات</span>
+                        </span>
+                      </div>
+
+                      <div className="bg-white border-2 border-black p-3.5 shadow-[4px_4px_0_rgba(0,0,0,1)]">
+                        <span className="text-[9px] font-bold text-gray-400 block">العائدات الإجمالية</span>
+                        <span className="text-xl font-black text-black mt-1 block font-mono">
+                          {calculatedGrossRevenue.toLocaleString('ar-DZ')} <span className="text-[10px] text-gray-500">دج</span>
+                        </span>
+                      </div>
+
+                      <div className="bg-white border-2 border-black p-3.5 shadow-[4px_4px_0_rgba(0,0,0,1)]">
+                        <span className="text-[9px] font-bold text-gray-400 block">مجموع التكاليف الكلي</span>
+                        <span className="text-xl font-black text-red-600 mt-1 block font-mono">
+                          {calculatedTotalCosts.toLocaleString('ar-DZ')} <span className="text-[10px] text-gray-500">دج</span>
+                        </span>
+                      </div>
+
+                      <div className="bg-white border-2 border-black p-4 shadow-[4px_4px_0_rgba(0,0,0,1)] col-span-2">
+                        <span className="text-[9px] font-black text-gray-400 block">صافي الأرباح المقدر (Net Profit)</span>
+                        <span className={`text-2xl font-black mt-1.5 block font-mono ${calculatedNetProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          {calculatedNetProfit.toLocaleString('ar-DZ')} دج / يوم
+                        </span>
+                        <span className="text-[10px] text-gray-400 font-bold block mt-1">شهرياً: ~ {(calculatedNetProfit * 30).toLocaleString('ar-DZ')} دج</span>
+                      </div>
+
+                      <div className="bg-black text-[#00FF41] border-2 border-black p-4 shadow-[4px_4px_0_rgba(0,0,0,1)]">
+                        <span className="text-[9px] font-mono block text-gray-400">معدل الـ ROI المتوقع</span>
+                        <span className="text-2xl font-black mt-1.5 block font-mono">
+                          {calculatedRoi >= 0 ? '+' : ''}{Math.round(calculatedRoi)} %
+                        </span>
+                      </div>
+
+                    </div>
+
+                    {/* Target CPA Guidelines inside neo cabinet */}
+                    <div className="bg-gray-50 border-2 border-black p-4 grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-bold text-black">
+                      <div className="bg-white border p-3">
+                        <span className="text-[10px] text-gray-400 block font-bold mb-1">نقطة التعادل القصوى (Break-Even CPA)</span>
+                        <p className="text-sm font-black text-red-700 font-mono">{Math.round(calculatedBreakEvenCpa).toLocaleString('ar-DZ')} دج</p>
+                        <p className="text-[9px] text-gray-450 mt-1">إذا تجاوزت تكلفة إعلانك هذا الرقم، فستبدأ في الخسارة فوراً!</p>
+                      </div>
+
+                      <div className="bg-white border p-3 border-[#00FF41]">
+                        <span className="text-[10px] text-[#22c55e] block font-extrabold mb-1">تكلفة الإعلان المستهدفة (Target CPA)</span>
+                        <p className="text-sm font-black text-green-700 font-mono">{calculatedSafeTargetCpa.toLocaleString('ar-DZ')} دج</p>
+                        <p className="text-[9px] text-gray-450 mt-1">تكلفة التحويل المثالية لتأمين هامش ربح COD Alger ممتاز وصافي.</p>
+                      </div>
+                    </div>
+
+                    {/* Wilayas Breakdown merged beautifully */}
+                    <div className="bg-white border-2 border-black p-5">
+                      <span className="text-xs font-black text-black block mb-3 border-b-2 border-black pb-1">📊 أفضل الولايات من حيث نسبة التوصيل وسعر الـ CPA بالجزائر:</span>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        {wilayaStats.map((st) => (
+                          <div key={st.code} className="p-2 border border-black bg-gray-50 text-[11px] font-bold">
+                            <div className="flex justify-between items-center mb-1">
+                              <span className="font-black">{st.name}</span>
+                              <span className="font-mono bg-black text-white px-1 py-0.2 text-[9px]">{st.code}</span>
+                            </div>
+                            <div className="flex justify-between text-[10px] text-gray-500">
+                              <span>معدل التوصيل:</span>
+                              <span className="text-green-700 font-black">74%</span>
+                            </div>
+                            <div className="flex justify-between text-[10px] text-gray-500">
+                              <span>متوسط CPA:</span>
+                              <span className="text-red-600 font-mono">650 دج</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              );
+            })()}
+
           </div>
         )}
 
@@ -537,6 +770,15 @@ export function SaaSLanding({
         {activeTab === 'enterprise_portal' && (
           <div className="space-y-8">
             <SaaSEnterprisePortal onGoToPricing={onGoToPricing} />
+          </div>
+        )}
+
+        {activeTab === 'marketing_hub' && (
+          <div className="space-y-8">
+            <SaaSMarketingHub 
+              userPlan={user?.plan} 
+              onGoToPricing={onGoToPricing}
+            />
           </div>
         )}
 

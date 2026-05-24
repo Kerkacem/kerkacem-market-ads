@@ -27,6 +27,7 @@ import { SaaSLanding } from './components/SaaSLanding';
 import { SaaSPricing } from './components/SaaSPricing';
 import { ChargilyPaymentSim } from './components/ChargilyPaymentSim';
 import { SaaSAdmin } from './components/SaaSAdmin';
+import { SaaSPublicLanding } from './components/SaaSPublicLanding';
 
 export interface ProjectData {
   id: string;
@@ -46,6 +47,10 @@ export interface ProjectData {
 
 export default function App() {
   const { user, serverDbAvailable } = useAuth();
+  
+  // Public Landing / Auth Navigation States
+  const [publicAuthView, setPublicAuthView] = useState<boolean>(false);
+  const [initialIsLogin, setInitialIsLogin] = useState<boolean>(true);
   
   // SaaS Navigation States
   const [saasMode, setSaasMode] = useState<'dashboard' | 'workspace' | 'pricing' | 'payment-sim' | 'admin'>('dashboard');
@@ -350,7 +355,7 @@ export default function App() {
         }
       } else if (appState === 'PHASE_1_DONE' && data1) {
         setAppState('LOADING');
-        setLoadingMsg('PHASE 2: جاري إنشاء 5 Nextify Visual Briefs للإعلانات الصورية...');
+        setLoadingMsg('PHASE 2: جاري إنشاء 5 MARKETING MASTER Visual Briefs للإعلانات الصورية...');
         try {
           const res = await runPhase2(data1, data05 || undefined);
           setData2(res);
@@ -501,7 +506,7 @@ export default function App() {
          return;
       }
       setAppState('LOADING');
-      setLoadingMsg('PHASE 2: إعادة بناء 5 Nextify Visual Briefs للإعلانات الصورية...');
+      setLoadingMsg('PHASE 2: إعادة بناء 5 MARKETING MASTER Visual Briefs للإعلانات الصورية...');
       setData2(null);
       setData3(null);
       setData4(null);
@@ -618,25 +623,179 @@ export default function App() {
   const handleDownloadPdf = () => {
     const element = document.getElementById('printable-area');
     if (!element) return;
-    
-    // Add global class to remove ALL scroll and height constraints across the DOM
-    document.body.classList.add('pdf-export-mode');
-    
-    // Small timeout ensures the DOM has repainted with the full unrestricted height
-    setTimeout(() => {
-      const currentWidth = document.documentElement.clientWidth;
+
+    // Helper to convert OKLAB to standard RGB
+    const oklabToRgb = (L: number, a_lab: number, b_lab: number, alpha: number = 1): string => {
+      const l_ = L + 0.3963377774 * a_lab + 0.2158037573 * b_lab;
+      const m_ = L - 0.1055613458 * a_lab - 0.0638541728 * b_lab;
+      const s_ = L - 0.0894841775 * a_lab - 1.2914855480 * b_lab;
+
+      const l3 = l_ * l_ * l_;
+      const m3 = m_ * m_ * m_;
+      const s3 = s_ * s_ * s_;
+
+      let r_lin =  4.0767416621 * l3 - 3.3077115913 * m3 + 0.2309699292 * s3;
+      let g_lin = -1.2684380046 * l3 + 2.6097574011 * m3 - 0.3413190470 * s3;
+      let b_lin = -0.0041960863 * l3 - 0.7034186147 * m3 + 1.7076147010 * s3;
+
+      const gamma = (c: number) => {
+        if (c <= 0.0031308) return 12.92 * c;
+        return 1.055 * Math.pow(c, 1 / 2.4) - 0.055;
+      };
+
+      const r = Math.max(0, Math.min(255, Math.round(gamma(r_lin) * 255)));
+      const g = Math.max(0, Math.min(255, Math.round(gamma(g_lin) * 255)));
+      const b = Math.max(0, Math.min(255, Math.round(gamma(b_lin) * 255)));
+
+      return alpha === 1 ? `rgb(${r}, ${g}, ${b})` : `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    };
+
+    // Helper to convert OKLCH to standard RGB
+    const oklchToRgb = (L: number, C: number, H: number, alpha: number = 1): string => {
+      const hRad = (H * Math.PI) / 180;
+      const a = C * Math.cos(hRad);
+      const b = C * Math.sin(hRad);
+      return oklabToRgb(L, a, b, alpha);
+    };
+
+    // Main translation function to parse oklab/oklch strings into standard rgb/rgba
+    const translateColors = (cssVal: string): string => {
+      if (typeof cssVal !== 'string') return cssVal;
       
+      let val = cssVal.replace(/in\s+okl(ab|ch),?\s*/gi, '');
+
+      // Translate oklch(L C H [ / A])
+      const oklchRegex = /oklch\(\s*([\d.%]+)\s+([\d.%]+)\s+([\d.-]+(?:deg|rad|turn)?)(?:\s*\/\s*([\d.%]+))?\s*\)/gi;
+      val = val.replace(oklchRegex, (_match, p1, p2, p3, p4) => {
+        try {
+          let l = parseFloat(p1);
+          if (p1.endsWith('%')) l /= 100;
+          let c = parseFloat(p2);
+          if (p2.endsWith('%')) c /= 100;
+          let h = parseFloat(p3);
+          let alpha = 1;
+          if (p4) {
+            alpha = parseFloat(p4);
+            if (p4.endsWith('%')) alpha /= 100;
+          }
+          return oklchToRgb(l, c, h, alpha);
+        } catch (e) {
+          return 'rgb(0, 0, 0)';
+        }
+      });
+
+      // Translate oklab(L A B [ / Alpha])
+      const oklabRegex = /oklab\(\s*([\d.%]+)\s+([\d.-]+)\s+([\d.-]+)(?:\s*\/\s*([\d.%]+))?\s*\)/gi;
+      val = val.replace(oklabRegex, (_match, p1, p2, p3, p4) => {
+        try {
+          let l = parseFloat(p1);
+          if (p1.endsWith('%')) l /= 100;
+          let a = parseFloat(p2);
+          let b = parseFloat(p3);
+          let alpha = 1;
+          if (p4) {
+            alpha = parseFloat(p4);
+            if (p4.endsWith('%')) alpha /= 100;
+          }
+          return oklabToRgb(l, a, b, alpha);
+        } catch (e) {
+          return 'rgb(0, 0, 0)';
+        }
+      });
+
+      return val;
+    };
+
+    // Helper to apply the getComputedStyle proxy color fixer
+    const patchWindowComputedStyle = (win: Window) => {
+      const originalGetComputedStyle = win.getComputedStyle;
+      win.getComputedStyle = function (elt, pseudoElt) {
+        const style = originalGetComputedStyle(elt, pseudoElt);
+        return new Proxy(style, {
+          get(target, prop) {
+            if (prop === 'getPropertyValue') {
+              return function (propertyName: string) {
+                const originalValue = target.getPropertyValue(propertyName);
+                return translateColors(originalValue);
+              };
+            }
+            try {
+              const val = (target as any)[prop];
+              if (typeof val === 'function') {
+                return val.bind(target);
+              }
+              if (typeof val === 'string' && (val.includes('oklab') || val.includes('oklch'))) {
+                return translateColors(val);
+              }
+              return val;
+            } catch (e) {
+              return undefined;
+            }
+          }
+        });
+      };
+      return originalGetComputedStyle;
+    };
+
+    // 1. Monkey-patch the parent window style computations
+    const originalParentGetComputedStyle = patchWindowComputedStyle(window);
+
+    // 2. Clone the printable area and place it under body (unbounded height layout)
+    const clone = element.cloneNode(true) as HTMLElement;
+    clone.id = 'printable-area-clone'; // Style with generic overrides
+    clone.classList.add('pdf-active-print'); // Apply the release heights and scrolls styles
+    
+    // Clean up unnecessary UI widgets inside the cloned element
+    const elementsToRemove = clone.querySelectorAll('.print-hide, .printable-hide, button, aside, header, form, .composer');
+    elementsToRemove.forEach(el => el.remove());
+
+    // Make the clone itself flow naturally on its own (no clipping ancestor bounds)
+    clone.style.position = 'absolute';
+    clone.style.left = '0';
+    clone.style.top = '0';
+    clone.style.width = '1024px'; // Ensure beautifully structured desktop-like proportions
+    clone.style.height = 'auto';
+    clone.style.minHeight = '100%';
+    clone.style.overflow = 'visible';
+    clone.style.display = 'block';
+    clone.style.background = '#ffffff';
+    clone.style.zIndex = '-9999';
+    clone.style.opacity = '1';
+    clone.style.pointerEvents = 'none';
+
+    // Append clone to body directly so html2canvas computes perfect coordinates
+    document.body.appendChild(clone);
+
+    // Add classes to apply global PDF mode
+    document.body.classList.add('pdf-export-mode');
+
+    const cleanUpAndRestore = () => {
+      window.getComputedStyle = originalParentGetComputedStyle;
+      document.body.classList.remove('pdf-export-mode');
+      if (clone && clone.parentNode) {
+        clone.parentNode.removeChild(clone);
+      }
+    };
+
+    // 3. Trigger html2pdf with full-fidelity desktop coordinates of the cloned node
+    setTimeout(() => {
       const opt = {
-        margin:       10,
+        margin:       12,
         filename:     `${productName.replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'project'}_marketing_master_report.pdf`,
         image:        { type: 'jpeg' as const, quality: 0.98 },
-        pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }, // Prevents cutting elements in half
+        pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] },
         html2canvas:  { 
-          scale: 2, // High resolution
-          windowWidth: currentWidth, 
-          scrollY: 0, // Force starting at the top
+          scale: 2, // High resolution crisp text rendering
           useCORS: true,
-          backgroundColor: '#ffffff'
+          logging: false,
+          backgroundColor: '#ffffff',
+          onclone: (clonedDoc: Document) => {
+            // Also patch style computations in the sandbox iframe container context
+            const clonedWindow = clonedDoc.defaultView;
+            if (clonedWindow) {
+              patchWindowComputedStyle(clonedWindow);
+            }
+          }
         },
         jsPDF:        { 
           unit: 'mm' as const, 
@@ -645,19 +804,33 @@ export default function App() {
         }
       };
 
-      html2pdf().set(opt).from(element).save().then(() => {
-        // Restore normal bounds
-        document.body.classList.remove('pdf-export-mode');
+      html2pdf().set(opt).from(clone).save().then(() => {
+        cleanUpAndRestore();
       }).catch((err: any) => {
         console.error("PDF generation error:", err);
-        document.body.classList.remove('pdf-export-mode');
+        cleanUpAndRestore();
       });
-    }, 400); // 400ms delay guarantees rendering
+    }, 450); // Slight delay guarantees full rendering lifecycle completes
   };
 
   // Conditional SaaS view rendering
   if (!user) {
-    return <SaaSAuth />;
+    if (publicAuthView) {
+      return (
+        <SaaSAuth 
+          initialIsLogin={initialIsLogin} 
+          onBackToLanding={() => setPublicAuthView(false)} 
+        />
+      );
+    }
+    return (
+      <SaaSPublicLanding 
+        onGoToAuth={(isLogin) => {
+          setInitialIsLogin(isLogin);
+          setPublicAuthView(true);
+        }} 
+      />
+    );
   }
 
   if (saasMode === 'dashboard') {

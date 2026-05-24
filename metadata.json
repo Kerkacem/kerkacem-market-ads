@@ -1,6 +1,8 @@
 {
-  "name": "Remix: Remix: Generated",
-  "description": "",
+  "name": "MARKETING MASTER",
+  "description": "منصة ذكية متكاملة لتحليل المنتجات وبناء الحملات الإعلانية وصفحات الهبوط للسوق الجزائري (COD).",
   "requestFramePermissions": [],
-  "majorCapabilities": []
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }

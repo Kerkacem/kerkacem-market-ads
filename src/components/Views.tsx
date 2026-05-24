@@ -543,6 +543,13 @@ export function Phase1View({ data, onNext, hideNext = false, onRebuild }: { data
         </div>
       )}
 
+      <div className="mt-8">
+        <SaaSComplianceAuditor 
+          phaseName="مستشار الجودة والامتثال - نتائج تحليل رادار المنتج" 
+          initialText={data.finalReport || ""} 
+        />
+      </div>
+
       {data.seoBlueprint && (
         <div className="border-2 border-black bg-black text-white p-6 mt-6 break-inside-avoid">
            <div className="flex items-center gap-3 mb-6 border-b-2 border-white pb-4">
@@ -612,7 +619,7 @@ export function Phase1View({ data, onNext, hideNext = false, onRebuild }: { data
               <span>إعادة بناء وتحسين هذه المرحلة (Phase 1) 🔄</span>
             </button>
           ) : (
-            <div className="font-display font-bold text-xl uppercase tracking-tighter">اكتملت المرحلة 1. هل نتابع توليد البرومبتات (Nextify Briefs)؟</div>
+            <div className="font-display font-bold text-xl uppercase tracking-tighter">اكتملت المرحلة 1. هل نتابع توليد البرومبتات (MARKETING MASTER Briefs)؟</div>
           )}
           <button onClick={onNext} className="px-10 py-4 bg-black text-white font-display font-bold text-lg uppercase tracking-wider border-2 border-black hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[4px_4px_0_#00FF41] transition-all flex items-center gap-3 shrink-0 ml-auto">
             اعتماد <ArrowRight size={20} className="rotate-180" />
@@ -812,7 +819,7 @@ CTA: ${sec.cta_text}`;
       <div className="mb-10 pb-6 border-b-2 border-black flex justify-between items-start">
         <div>
            <h2 className="text-5xl font-display font-black uppercase tracking-tighter text-black flex items-center gap-4">صفحة هبوط خارقة التحويل</h2>
-           <p className="font-mono text-sm font-bold uppercase mt-4 opacity-50" dir="ltr">Phase 03 // Landing Page Classic & Nextify LP</p>
+           <p className="font-mono text-sm font-bold uppercase mt-4 opacity-50" dir="ltr">Phase 03 // Landing Page Classic & MARKETING MASTER LP</p>
         </div>
         <CopyButton text={getFullCopyText()} />
       </div>
@@ -1244,6 +1251,13 @@ export function Phase7View_AdGenerator({ data, onRebuild }: { data: Phase7_AdGen
         <p className="text-lg font-medium">{data.uniqueAngle.description}</p>
       </div>
 
+      <div className="mt-8">
+        <SaaSComplianceAuditor 
+          phaseName="مستشار الجودة والامتثال - تدقيق الكوبي رايتنج المولد" 
+          initialText={data.adIdeas?.[0]?.copywriting || ""} 
+        />
+      </div>
+
       <h3 className="text-4xl font-display font-black mt-12 mb-6">5 أفكار إعلانية مبنية على التحليل:</h3>
       
       <div className="space-y-10">
@@ -1301,5 +1315,221 @@ export function Phase7View_AdGenerator({ data, onRebuild }: { data: Phase7_AdGen
         </div>
       )}
     </motion.div>
+  );
+}
+
+// MARKETING MASTER AI Quality & B2B Compliance Auditor Component (Algeria 2026 Strategy)
+export function SaaSComplianceAuditor({ initialText = '', phaseName = '' }: { initialText?: string; phaseName?: string }) {
+  const [copyToAudit, setCopyToAudit] = useState(
+    initialText || "عرض خاص ومحدود بالجزائر: حزام الظهر الطبي الفاخر للتخلص من الآلام نهائياً وبدون تعب! التوصيل متوفر لـ 58 ولاية والدفع بعد معاينة وفحص الطلب ببلدية الإقامة. اطلب الآن مباشرة للاستفادة من تخفيض اليوم!"
+  );
+  const [strictMode, setStrictMode] = useState(true);
+  const [showResult, setShowResult] = useState(false);
+  const [analyzing, setAnalyzing] = useState(false);
+
+  // Computed metrics live checkers
+  const hasEnglish = /[a-zA-Z]/g.test(copyToAudit);
+  const hasDelivery = /التوصيل|توصيل/g.test(copyToAudit);
+  const hasWilayas = /ولاية|الولايات/g.test(copyToAudit);
+  const hasCod = /الدفع|الاستلام|دفع|استلام/g.test(copyToAudit);
+  const hasGuarantee = /ضمان|مضمون|كفالة/g.test(copyToAudit);
+  const hasCta = /اطلب|احصل|اشتري|سجل|طلب/g.test(copyToAudit);
+  const isTooShort = copyToAudit.trim().length < 40;
+
+  // Compute stats logic
+  let score = 100;
+  const warningsList: string[] = [];
+  const passesList: string[] = [];
+
+  if (hasEnglish) {
+    score -= strictMode ? 25 : 15;
+    warningsList.push("تم العثور على أحرف إنجليزية/لاتينية! يفضل فِيسْ بُوك استخدام نصوص عربية مبنية لعدسات السوق الجزائري COD لتسهيل القبول والحفاظ على جودة الأداء.");
+  } else {
+    passesList.push("الامتثال اللغوي التام: خالٍ من اللاتينية والإنجليزية والمصطلحات الدخيلة 💯");
+  }
+
+  if (hasDelivery) {
+    passesList.push("توضيح توفر خدمة الشحن والتوصيل المحلي 🚚");
+  } else {
+    score -= 15;
+    warningsList.push("لم نجد ذكر لمصطلح 'التوصيل'. المستهلك الجزائري يبحث دائماً أولاً عن آلية التوصيل وطريقته.");
+  }
+
+  if (hasWilayas) {
+    passesList.push("إدراج تغطية الولايات الـ 58 (Wilayas Breakdown) دال على الجدية الاحترافية 🗺️");
+  } else {
+    score -= 15;
+    warningsList.push("لم تذكر تغطية 'الولايات الـ 58' أو كامل الولايات الوطنية بالجزائر، مما يخفض بشكل ملموس نسب التحويل (CTR).");
+  }
+
+  if (hasCod) {
+    passesList.push("توطيد الأمان بذكر التعهد بالدفع عند الاستلام بالدينار (COD Algeria Mode) 💰");
+  } else {
+    score -= 20;
+    warningsList.push("غاب مصطلح 'الدفع عند الاستلام'. ثقة المشتري الجزائري تزيد بنسبة 85% عند رؤية هذا التعهد صراحة.");
+  }
+
+  if (hasGuarantee) {
+    passesList.push("بناء الثقة بتقديم ضمان الجودة وفحص السلعة قبل الدفع 🛡️");
+  } else {
+    score -= 10;
+    warningsList.push("يستحسن إضافة 'ضمان الجودة' أو فحص السلعة في شروط الإرسال لتجنب رفض الاستلام وارتجاع الطرود.");
+  }
+
+  if (hasCta) {
+    passesList.push("دعوة واضحة للمباشرة واتخاذ القرار الفوري بالشراء (CTA Catalyst) 🔥");
+  } else {
+    score -= 15;
+    warningsList.push("لم نجد صيغة أمر مباشر واضحة (مثل: اطلب الآن، احصل عليه اليوم، املأ الاستمارة الآن بشكل مباشر).");
+  }
+
+  if (isTooShort) {
+    score -= 10;
+    warningsList.push("النص غاية في القصر. يفضل توسيع الشرح لبيان زوايا المنافع والألم قبل الدعوة للشراء.");
+  }
+
+  const finalScore = Math.max(10, score);
+
+  const handleRunAudit = () => {
+    setAnalyzing(true);
+    setTimeout(() => {
+      setAnalyzing(false);
+      setShowResult(true);
+    }, 1200);
+  };
+
+  return (
+    <div className="border-2 border-black bg-white p-5 shadow-[4px_4px_0_rgba(0,0,0,1)] space-y-5 break-inside-avoid" dir="rtl">
+      
+      {/* Visual top indicator banner */}
+      <div className="border-b border-black pb-3 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+        <div>
+          <span className="text-[9px] font-mono font-black bg-black text-[#00FF41] px-2 py-0.5 rounded-sm uppercase tracking-wide inline-block mb-1">
+            {phaseName || "نظام الفحص الاستراتيجي الآلي للامتثال والنوعية"}
+          </span>
+          <h4 className="text-sm font-black text-black flex items-center gap-1.5">
+            <span>🛡️ مدقق الامتثال التسويقي وجودة الكوبي رايتنج (MARKETING MASTER AI Quality Auditor)</span>
+          </h4>
+          <p className="text-[10px] text-gray-400 mt-1 font-bold leading-relaxed">
+            محاكي ذكي يفحص تركيب النصوص والخطافات التسويقية استناداً لقواعد الامتثال بالجزائر لعام 2026.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-1.5 p-1 bg-gray-50 border border-black text-[10px] font-black shrink-0">
+          <span className="cursor-pointer select-none">تشغيل الفحص الصارم (Meta Algeria):</span>
+          <input 
+            type="checkbox" 
+            checked={strictMode} 
+            onChange={(e) => setStrictMode(e.target.checked)}
+            className="w-3.5 h-3.5 accent-black cursor-pointer" 
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
+        
+        {/* Input box */}
+        <div className="md:col-span-7 space-y-2">
+          <span className="text-[10px] font-bold text-gray-400 block">📝 عدل نص الكوبي رايتنج أو الصق النص الذي ترغب في فحصه:</span>
+          <textarea
+            className="w-full h-36 p-3 border-2 border-black font-sans text-xs bg-gray-50 text-black font-semibold leading-relaxed"
+            value={copyToAudit}
+            onChange={(e) => {
+              setCopyToAudit(e.target.value);
+              setShowResult(false);
+            }}
+            placeholder="اكتب بالدارجة أو الفصحى نص إعلانك..."
+          />
+          <button 
+            onClick={handleRunAudit}
+            disabled={analyzing}
+            className="w-full py-2 bg-black hover:bg-neutral-800 text-[#00FF41] font-black border border-black uppercase text-xs flex items-center justify-center gap-1.5"
+          >
+            {analyzing ? (
+              <>
+                <RotateCw size={13} className="animate-spin text-[#00FF41]" />
+                <span>جاري تحليل النص ومراجعة القواعد...</span>
+              </>
+            ) : (
+              <span>🔍 تدقيق الكوبي رايتنج وتحليل معايير الامتثال</span>
+            )}
+          </button>
+        </div>
+
+        {/* Audit outputs cabinet */}
+        <div className="md:col-span-5 bg-neutral-50 border border-neutral-300 p-4 relative overflow-hidden flex flex-col justify-between">
+          
+          {analyzing && (
+            <div className="absolute inset-0 bg-white/85 flex items-center justify-center z-10">
+              <div className="p-3 border border-black bg-white flex items-center gap-2 font-mono font-bold text-[10px]">
+                <RotateCw size={14} className="animate-spin text-black" />
+                <span>تحليل التركيب وقواعد COD الجزائر...</span>
+              </div>
+            </div>
+          )}
+
+          {!showResult && !analyzing ? (
+            <div className="h-full flex flex-col items-center justify-center text-center p-4 space-y-2 my-auto">
+              <span className="text-3xl">🔬</span>
+              <p className="font-black text-black text-[11px]">في انتظار تشغيل فحص الملاءمة</p>
+              <p className="text-[10px] text-gray-400 font-bold">انقر على زر الفحص بالأسفل لاحتساب نقاط الموثوقية آلياً.</p>
+            </div>
+          ) : (
+            <div className="space-y-3.5 animate-fade-in text-[11px]">
+              
+              <div className="flex justify-between items-center border-b pb-1.5">
+                <span className="text-[10px] font-black text-gray-500 uppercase">نتائج المطابقة الإجمالية</span>
+                <div className="flex items-center gap-1.5">
+                  <span className="font-bold text-[10px]">الدرجة:</span>
+                  <span className={`p-0.5 px-2 text-white text-xs font-black border border-black font-mono ${finalScore >= 80 ? 'bg-green-600' : finalScore >= 50 ? 'bg-amber-500' : 'bg-red-650'}`}>
+                    {finalScore} / 100
+                  </span>
+                </div>
+              </div>
+
+              {/* Passes */}
+              <div className="space-y-1">
+                <span className="text-[9px] font-black text-green-700 block">🟢 قواعد مستوفاة بنجاح ({passesList.length}):</span>
+                {passesList.length === 0 ? (
+                  <p className="text-[9px] text-gray-450 italic">لم نجد أي حافز متطابق في الجمل الحالية.</p>
+                ) : (
+                  <div className="max-h-[80px] overflow-y-auto space-y-0.5">
+                    {passesList.map((p, i) => (
+                      <div key={i} className="text-[9px] font-black text-emerald-700 bg-green-50/50 p-1 border border-green-200 flex items-center gap-1">
+                        <span>✓</span>
+                        <span>{p}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Warnings */}
+              <div className="space-y-1 border-t border-dashed pt-2">
+                <span className="text-[9px] font-black text-red-700 block">🚨 تنبيهات وملاحظات المستشار ({warningsList.length}):</span>
+                {warningsList.length === 0 ? (
+                  <div className="text-[9.5px] font-black text-emerald-800 bg-green-50 p-1.5 border border-green-200">
+                    تهانينا الحارة! النص الإعلاني مطابق وقابل للاستخدام بنسبة 100% لخوض السوق الجزائري. 🎉
+                  </div>
+                ) : (
+                  <div className="max-h-[80px] overflow-y-auto space-y-1">
+                    {warningsList.map((w, i) => (
+                      <div key={i} className="text-[9px] text-red-800 bg-red-50/50 p-1 border border-red-200 flex items-start gap-1">
+                        <span className="text-red-500 font-black">•</span>
+                        <span>{w}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+            </div>
+          )}
+
+        </div>
+
+      </div>
+
+    </div>
   );
 }

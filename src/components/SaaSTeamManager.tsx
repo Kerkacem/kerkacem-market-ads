@@ -133,7 +133,7 @@ export function SaaSTeamManager({ onGoToPricing }: SaaSTeamManagerProps) {
             <span>إدارة فرق العمل والحسابات الفرعية (Team Access Controls)</span>
           </h3>
           <p className="text-xs text-gray-500 font-bold mt-1 max-w-2xl leading-relaxed">
-            قم بتنظيم الصلاحيات، وإضافة أعضاء فريقك في الوكالة لتوزيع تقارير Nextify، والعمل سوياً على نفس المشاريع وحملات COD دون تضارب.
+            قم بتنظيم الصلاحيات، وإضافة أعضاء فريقك في الوكالة لتوزيع تقارير MARKETING MASTER، والعمل سوياً على نفس المشاريع وحملات COD دون تضارب.
           </p>
         </div>
         <div className="bg-gray-50 border border-black px-4 py-2 font-mono text-xs text-center min-w-[120px]">

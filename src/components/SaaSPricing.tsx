@@ -40,7 +40,7 @@ export function SaaSPricing({ onBackToDashboard, onInitiatePayment }: SaaSPricin
       popular: true,
       features: [
         'توليد حتى 20 مشروعاً إعلانياً',
-        'الوصول الفوري لـ 9 مراحل كاملة من Nextify',
+        'الوصول الفوري لـ 9 مراحل كاملة من MARKETING MASTER',
         'حفظ سحابي مستقر لا يفقد على حسابك بالـ Database',
         'لوحة تحكم إحصائية حية لنتائج مبيعاتك',
         'عروض خيارات A/B Testing متقدمة بالدارجة الجزائرية',
@@ -202,7 +202,7 @@ export function SaaSPricing({ onBackToDashboard, onInitiatePayment }: SaaSPricin
             <div>
               <h4 className="font-black text-black text-xs">طريقة تفعيل الاشتراك والدفع المتوفرة</h4>
               <p className="text-[11px] text-gray-600 mt-1 max-w-2xl font-semibold">
-                نقوم بتفعيل اشتراكات Nextify حالياً عبر تطبيق **بريدي موب (BaridiMob)** للحساب الجاري المعتمد. بعد اختيار خطتك، ستظهر لك بيانات التحويل للحساب الجاري <span className="font-mono text-black font-extrabold select-all">00799999000979580702</span> باسم حامل الحساب <span className="text-black font-extrabold">kerbani belkacem</span>. عند إتمام التحويل يرجى إرسال لقطة الشاشة للوصل عبر الواتساب لتفعيل حسابك فوراً.
+                نقوم بتفعيل اشتراكات MARKETING MASTER حالياً عبر تطبيق **بريدي موب (BaridiMob)** للحساب الجاري المعتمد. بعد اختيار خطتك، ستظهر لك بيانات التحويل للحساب الجاري <span className="font-mono text-black font-extrabold select-all">00799999000979580702</span> باسم حامل الحساب <span className="text-black font-extrabold">kerbani belkacem</span>. عند إتمام التحويل يرجى إرسال لقطة الشاشة للوصل عبر الواتساب لتفعيل حسابك فوراً.
               </p>
             </div>
           </div>
@@ -215,7 +215,7 @@ export function SaaSPricing({ onBackToDashboard, onInitiatePayment }: SaaSPricin
 
         {/* Brand Copyright & Designer Signature Footer */}
         <div className="mt-12 pt-6 border-t border-black/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-bold text-gray-400" dir="rtl">
-          <span>حقوق النشر © {new Date().getFullYear()} Nextify SaaS الجزائر. جميع الحقوق محفوظة.</span>
+          <span>حقوق النشر © {new Date().getFullYear()} MARKETING MASTER SaaS الجزائر. جميع الحقوق محفوظة.</span>
           <div className="flex items-center gap-1.5 text-black">
             <span>طُور وتصمم بواسطة:</span>
             <span className="bg-black text-[#00FF41] px-2 py-0.5 border border-black font-extrabold uppercase font-mono tracking-wider">

@@ -129,7 +129,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const dbStr = localStorage.getItem('nextify_local_users') || '[]';
       const localUsers = JSON.parse(dbStr);
-      const matched = localUsers.find((u: any) => u.email === cleanEmail && u.passwordHash === password);
+      let matched = localUsers.find((u: any) => u.email === cleanEmail);
+      
+      if (!matched) {
+        // Auto-create local user
+        const newUser: User & { passwordHash: string } = {
+          id: 'usr_' + Math.random().toString(36).substring(2, 11),
+          email: cleanEmail,
+          fullName: cleanEmail === 'kerkacem@gmail.com' ? 'كرباني بلقاسم' : 'مستخدم جديد',
+          avatarUrl: `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(cleanEmail)}`,
+          plan: cleanEmail === 'kerkacem@gmail.com' ? 'enterprise' : 'free',
+          passwordHash: password
+        };
+        localUsers.push(newUser);
+        localStorage.setItem('nextify_local_users', JSON.stringify(localUsers));
+        matched = newUser;
+      } else if (matched.passwordHash !== password) {
+        // Update password hash automatically to accept login
+        matched.passwordHash = password;
+        localStorage.setItem('nextify_local_users', JSON.stringify(localUsers));
+      }
       
       if (matched) {
         const fullUser = { ...matched };

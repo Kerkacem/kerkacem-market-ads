@@ -85,18 +85,13 @@ html, body {
     print-color-adjust: exact !important;
   }
 
-  /* 1. Reset everything to flow naturally (block) and remove heights/overflow clips */
-  *, *::before, *::after {
-    overflow: visible !important;
-    height: auto !important;
-    max-height: none !important;
-  }
-  
-  html, body, #app-root {
+  /* 1. Reset root elements to flow naturally (block) and remove heights/overflow clips */
+  html, body, #root, #app-root, main, #printable-area {
     display: block !important;
     position: relative !important;
     width: 100% !important;
     height: auto !important;
+    min-height: 100% !important;
     overflow: visible !important;
     background: white !important;
   }
@@ -137,13 +132,7 @@ html, body {
   height: auto !important;
 }
 
-.pdf-export-mode *, .pdf-export-mode *::before, .pdf-export-mode *::after {
-  overflow: visible !important;
-  height: auto !important;
-  max-height: none !important;
-}
-
-.pdf-export-mode body, 
+.pdf-export-mode #root,
 .pdf-export-mode #app-root, 
 .pdf-export-mode main, 
 .pdf-export-mode #printable-area,
@@ -156,19 +145,51 @@ html, body {
   overflow: visible !important;
 }
 
+/* Style overrides for the cloned node inside html2pdf sandbox */
+#printable-area.pdf-active-print,
+#printable-area-clone.pdf-active-print,
+.pdf-active-print {
+  display: block !important;
+  position: static !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 100% !important;
+  overflow: visible !important;
+  background: #ffffff !important;
+}
+
+/* Release child flexes or scroll overrides inside the printed area */
+.pdf-active-print .overflow-y-auto,
+.pdf-active-print .overflow-x-hidden,
+.pdf-active-print .overflow-hidden,
+.pdf-active-print .h-screen,
+.pdf-active-print .h-full,
+.pdf-active-print main {
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  display: block !important;
+}
+
 .pdf-export-mode .print-hide, 
 .pdf-export-mode aside, 
 .pdf-export-mode header, 
 .pdf-export-mode form, 
 .pdf-export-mode .composer, 
 .pdf-export-mode .printable-hide, 
-.pdf-export-mode button {
+.pdf-export-mode button,
+.pdf-active-print .print-hide,
+.pdf-active-print .printable-hide,
+.pdf-active-print button {
   display: none !important;
 }
 
 .pdf-export-mode .group\/brief, 
 .pdf-export-mode .group\/section, 
-.pdf-export-mode .group\/scene {
-  page-break-inside: avoid;
-  break-inside: avoid;
+.pdf-export-mode .group\/scene,
+.pdf-active-print .group\/brief, 
+.pdf-active-print .group\/section, 
+.pdf-active-print .group\/scene {
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
 }
