@@ -16,7 +16,7 @@ import {
   Phase7_AdGenerator
 } from './types';
 import { motion, AnimatePresence } from 'motion/react';
-import { Loader2, Printer, Plus, Download, Menu, X } from 'lucide-react';
+import { Loader2, Printer, Plus, Download, Menu, X, Settings, Key } from 'lucide-react';
 // @ts-ignore
 import html2pdf from 'html2pdf.js';
 
@@ -28,6 +28,7 @@ import { SaaSPricing } from './components/SaaSPricing';
 import { ChargilyPaymentSim } from './components/ChargilyPaymentSim';
 import { SaaSAdmin } from './components/SaaSAdmin';
 import { SaaSPublicLanding } from './components/SaaSPublicLanding';
+import { SettingsModal } from './components/SettingsModal';
 
 export interface ProjectData {
   id: string;
@@ -75,6 +76,7 @@ export default function App() {
   const [currentProjectId, setCurrentProjectId] = useState<string | null>(null);
   const [savedProjects, setSavedProjects] = useState<ProjectData[]>([]);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(true);
 
   // Sync projects from database with localStorage backup
   const fetchSaaSProjects = async () => {
@@ -936,6 +938,14 @@ export default function App() {
             )}
           </div>
           <div className="flex items-center gap-2 md:gap-3">
+             <button 
+               onClick={() => setIsSettingsOpen(true)}
+               className="flex bg-black hover:bg-neutral-950 text-white hover:text-[#00FF41] p-1.5 md:p-2 px-3 md:px-4 gap-2 items-center text-xs md:text-sm font-bold uppercase border-2 border-black transition-all shadow-[2px_2px_0_rgba(0,0,0,1)] hover:shadow-none"
+               title="مفاتيح الـ API لـ Gemini"
+             >
+               <Key size={16} className="text-[#00FF41] shrink-0" />
+               <span className="hidden sm:inline">إعدادات الـ API</span>
+             </button>
              {appState !== 'IDLE' && (
                  <button onClick={handleDownloadPdf} className="hidden md:flex bg-black text-[#00FF41] hover:bg-[#00FF41] hover:text-black p-1.5 md:p-2 px-3 md:px-4 gap-2 items-center text-xs md:text-sm font-bold uppercase border-2 border-black transition-colors shadow-[2px_2px_0_#00FF41]" title="Download PDF / Print">
                    <Printer size={16} /> <span className="hidden md:inline">استخراج PDF</span>
@@ -987,6 +997,7 @@ export default function App() {
           isConfirming={['PHASE_0_DONE', 'PHASE_05_DONE', 'PHASE_1_DONE', 'PHASE_2_DONE', 'PHASE_3_DONE', 'PHASE_4_DONE', 'PHASE_5_DONE', 'PHASE_6_DONE'].includes(appState)}
         />
       </main>
+      <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
     </div>
   );
 }
